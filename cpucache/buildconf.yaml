@@ -1,0 +1,32 @@
+
+buildroot: _build
+
+tasks:
+  traversals :
+    features : cxxprogram
+    source   : traversals.cpp
+
+byfilter:
+  - for: all
+    set:
+      libs: benchmark
+      defines: NDEBUG
+
+configure:
+  - do: check-libs
+
+CMN_GCC_FLAGS: -Wall -Wextra -std=c++17 -fno-exceptions -fno-rtti #-fno-omit-frame-pointer
+
+buildtypes:
+  default : release
+  release:
+    toolchain : auto-c++
+    cxxflags.select:
+      #default: $CMN_GCC_FLAGS -O2
+      default: $CMN_GCC_FLAGS -O3
+      msvc   : /O2 /EHsc
+  debug:
+    toolchain : auto-c++
+    cxxflags.select:
+        default: $CMN_GCC_FLAGS -O0 -g
+        msvc   : /Od /EHsc
