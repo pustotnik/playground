@@ -10,7 +10,6 @@ byfilter:
   - for: all
     set:
       libs: benchmark
-      defines: NDEBUG
 
 configure:
   - do: check-libs

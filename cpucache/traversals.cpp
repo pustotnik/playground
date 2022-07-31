@@ -26,7 +26,7 @@ public:
     const Row& operator[](size_t i) const { return _data[i]; }
 
 private:
-    typedef vector<vector<T>> Data;
+    typedef vector<Row> Data;
 
     size_t _rows = 0;
     size_t _cols = 0;
