@@ -5,6 +5,9 @@ tasks:
   traversals :
     features : cxxprogram
     source   : traversals.cpp
+  falsesharing:
+    features : cxxprogram
+    source   : falsesharing.cpp
 
 byfilter:
   - for: all

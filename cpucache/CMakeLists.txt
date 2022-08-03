@@ -60,3 +60,6 @@ find_package(benchmark REQUIRED)
 
 add_executable(traversals traversals.cpp)
 target_link_libraries(traversals benchmark::benchmark)
+
+add_executable(falsesharing falsesharing.cpp)
+target_link_libraries(falsesharing benchmark::benchmark)
