@@ -1,0 +1,20 @@
+
+CMN_GCC_FLAGS: -Wall -Wextra -std=c++17 -fno-rtti #-fno-omit-frame-pointer
+
+tasks:
+  return_several :
+    features : cxxprogram
+    source   : return_several.cpp
+
+byfilter:
+  - for: all
+    set:
+      libs: benchmark
+      toolchain : auto-c++
+      cxxflags.select:
+        #default: $CMN_GCC_FLAGS -O2
+        default: $CMN_GCC_FLAGS -O3
+        msvc   : /O2 /EHsc
+
+configure:
+  - do: check-libs
