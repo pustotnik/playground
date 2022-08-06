@@ -2,91 +2,148 @@
 #include <cstddef>
 #include <tuple>
 #include <utility>
+#include <iostream>
 
 #include <benchmark/benchmark.h>
 
 using namespace std;
 
-struct Test
+static constexpr size_t VECT_SIZE = 100;
+
+class Test
 {
+public:
     struct Line {
         const char* data = nullptr;
         size_t      len = 0;
     };
 
-    const char* test1(size_t& len);
+    Test(): _lines(VECT_SIZE) {
+        for(size_t i = 0; i < _lines.size(); ++i) {
+            _lines[i].len = i;
+        }
+    }
 
-    Line test2();
+    const char* returnOneAndArg(size_t& len);
 
-    std::pair<const char*, size_t> test3();
+    Line returnStruct();
 
-    std::tuple<const char*, size_t> test4();
+    std::pair<const char*, size_t> returnPair();
 
-    char data[10] = {0};
-    size_t size = 10;
+    std::tuple<const char*, size_t> returnTuple();
+
+    void returnVectorAsArg(vector<Line>& v);
+    vector<Line> returnVector();
+
+private:
+    char _data[10] = {0};
+    size_t _size = 10;
+
+    vector<Line> _lines;
 };
 
-const char* Test::test1(size_t& len) {
-    len = size;
-    const char* p = data;
+const char* Test::returnOneAndArg(size_t& len) {
+    len = _size;
+    const char* p = _data;
     return p;
 }
 
-Test::Line Test::test2() {
+Test::Line Test::returnStruct() {
     Line result;
-    result.data = data;
-    result.len = size;
+    result.data = _data;
+    result.len = _size;
     return result;
 }
 
-std::pair<const char*, size_t> Test::test3() {
-    return {data, size};
+std::pair<const char*, size_t> Test::returnPair() {
+    return {_data, _size};
 }
 
-std::tuple<const char*, size_t> Test::test4() {
-    return {data, size};
+std::tuple<const char*, size_t> Test::returnTuple() {
+    return {_data, _size};
 }
 
-static void returnAsClassic(benchmark::State& state) {
+void Test::returnVectorAsArg(vector<Line>& v) {
+    v = _lines;
+}
+
+vector<Test::Line> Test::returnVector() {
+    return _lines;
+}
+
+static void BM_ReturnAsClassic(benchmark::State& state) {
     Test test;
     for (auto _ : state) {
         size_t len;
-        auto result = test.test1(len);
+        auto result = test.returnOneAndArg(len);
         benchmark::DoNotOptimize(result);
         benchmark::DoNotOptimize(len);
     }
 }
-BENCHMARK(returnAsClassic);
+BENCHMARK(BM_ReturnAsClassic);
 
-static void returnAsStruct(benchmark::State& state) {
+static void BM_ReturnAsStruct(benchmark::State& state) {
     Test test;
     for (auto _ : state) {
-        auto [data, len] = test.test2();
+        auto [data, len] = test.returnStruct();
         benchmark::DoNotOptimize(data);
         benchmark::DoNotOptimize(len);
     }
 }
-BENCHMARK(returnAsStruct);
+BENCHMARK(BM_ReturnAsStruct);
 
-static void returnAsPair(benchmark::State& state) {
+static void BM_ReturnAsPair(benchmark::State& state) {
     Test test;
     for (auto _ : state) {
-        auto [data, len] = test.test3();
+        auto [data, len] = test.returnPair();
         benchmark::DoNotOptimize(data);
         benchmark::DoNotOptimize(len);
     }
 }
-BENCHMARK(returnAsPair);
+BENCHMARK(BM_ReturnAsPair);
 
-static void returnAsTuple(benchmark::State& state) {
+static void BM_ReturnAsTuple(benchmark::State& state) {
     Test test;
     for (auto _ : state) {
-        auto [data, len] = test.test4();
+        auto [data, len] = test.returnTuple();
         benchmark::DoNotOptimize(data);
         benchmark::DoNotOptimize(len);
     }
 }
-BENCHMARK(returnAsTuple);
+BENCHMARK(BM_ReturnAsTuple);
+
+static void BM_ReturnVectorAsArg(benchmark::State& state) {
+    Test test;
+    for (auto _ : state) {
+        vector<Test::Line> v;
+        test.returnVectorAsArg(v);
+        benchmark::DoNotOptimize(v);
+    }
+}
+BENCHMARK(BM_ReturnVectorAsArg);
+
+static void BM_ReturnVector(benchmark::State& state) {
+    Test test;
+    for (auto _ : state) {
+        auto v = test.returnVector();
+        benchmark::DoNotOptimize(v);
+    }
+}
+BENCHMARK(BM_ReturnVector);
+
+static void BM_CopyVector(benchmark::State& state) {
+
+    vector<Test::Line> lines(VECT_SIZE);
+    for(size_t i = 0; i < lines.size(); ++i) {
+        lines[i].len = i*2;
+    }
+
+    for (auto _ : state) {
+        auto v = lines;
+        benchmark::DoNotOptimize(v);
+    }
+}
+BENCHMARK(BM_CopyVector);
 
 // Run the benchmarks
 BENCHMARK_MAIN();
