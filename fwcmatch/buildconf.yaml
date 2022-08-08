@@ -1,0 +1,30 @@
+
+buildroot: _build
+
+tasks:
+  fwcmatch-bench :
+    features : cxxprogram
+    source   : 'src/**/*.cpp'
+    libs     : benchmark
+
+configure:
+  - do: check-libs
+
+CMN_GCC_FLAGS: -Wall -Wextra -std=c++17 -fno-rtti #-flto #-march=native
+#CMN_LINK_FLAGS: -flto
+CMN_LINK_FLAGS: " "
+
+buildtypes:
+  default : release
+  release:
+    toolchain : auto-c++
+    #toolchain : clang++
+    #cxxflags: $CMN_GCC_FLAGS -O2
+    cxxflags: $CMN_GCC_FLAGS -O3
+    linkflags: $CMN_LINK_FLAGS
+    defines: NDEBUG=1
+
+  debug:
+    toolchain : auto-c++
+    cxxflags: $CMN_GCC_FLAGS -O0 -g
+    linkflags: $CMN_LINK_FLAGS
