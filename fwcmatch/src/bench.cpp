@@ -70,7 +70,7 @@ BENCHMARK(BM_Sequential<MMapReader, FNMatch>)
 
 ///////////////////////////////////////////////////////////
 // C++ std::regex is very slow
-//*
+/*
 BENCHMARK(BM_Sequential<FGetsReader, REMatch>)
     ->Apply(genSequentialArguments);
 
