@@ -10,6 +10,7 @@
 #include "fstreamreader.h"
 #include "mywildcard.h"
 #include "fnmatchwildcard.h"
+#include "regexwildcard.h"
 #include "seqproc.h"
 #include "common.h"
 
@@ -56,6 +57,8 @@ BENCHMARK(BM_Sequential<FStreamReader, MyWildcardMatch>)
 BENCHMARK(BM_Sequential<MMapReader, MyWildcardMatch>)
     ->Apply(genSequentialArguments);
 
+///////////////////////////////////////////////////////////
+
 BENCHMARK(BM_Sequential<FGetsReader, FNMatch>)
     ->Apply(genSequentialArguments);
 
@@ -64,6 +67,19 @@ BENCHMARK(BM_Sequential<FStreamReader, FNMatch>)
 
 BENCHMARK(BM_Sequential<MMapReader, FNMatch>)
     ->Apply(genSequentialArguments);
+
+///////////////////////////////////////////////////////////
+// C++ std::regex is very slow
+//*
+BENCHMARK(BM_Sequential<FGetsReader, REMatch>)
+    ->Apply(genSequentialArguments);
+
+BENCHMARK(BM_Sequential<FStreamReader, REMatch>)
+    ->Apply(genSequentialArguments);
+
+BENCHMARK(BM_Sequential<MMapReader, REMatch>)
+    ->Apply(genSequentialArguments);
+//*/
 
 // Run the benchmarks
 int main(int argc, char** argv) {
