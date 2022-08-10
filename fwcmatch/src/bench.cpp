@@ -24,16 +24,13 @@ void BM_Sequential(benchmark::State& state) {
 
     const size_t maxLines = state.range(0);
 
+    auto freader   = FReader();
+    auto wcmatch   = WildcardMatch();
+    auto processor = SequentialProcessor(maxLines);
+
     size_t found = 0;
     for (auto _ : state) {
-
-        auto freader   = FReader();
-        auto wcmatch   = WildcardMatch();
-        auto processor = SequentialProcessor();
-
-        found = processor.execute(benchFileName, benchPattern,
-                            wcmatch, freader, maxLines);
-
+        found = processor.execute(benchFileName, benchPattern, wcmatch, freader);
         benchmark::DoNotOptimize(found);
     }
 

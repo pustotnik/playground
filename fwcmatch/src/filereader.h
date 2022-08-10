@@ -4,7 +4,9 @@
 #include <string>
 #include <string_view>
 
-class FileReader
+#include "noncopyable.h"
+
+class FileReader: private noncopyable
 {
 public:
     virtual ~FileReader() {};
@@ -32,3 +34,19 @@ inline void FileReader::setBuffer(char* buffer, size_t bufferSize) {
     _buffer = buffer;
     _bufferSize = bufferSize;
 }
+
+// RAII for open/close of FileReader
+class ScopedFileOpener final: private noncopyable {
+public:
+    ScopedFileOpener(FileReader& freader, const std::string& filename):
+    _freader(freader) {
+        _freader.open(filename);
+    }
+
+    ~ScopedFileOpener() {
+        _freader.close();
+    }
+
+private:
+    FileReader& _freader;
+};

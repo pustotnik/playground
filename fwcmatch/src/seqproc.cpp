@@ -1,8 +1,6 @@
 
 #include <cassert>
 #include <cstddef>
-#include <string_view>
-#include <vector>
 #include <algorithm>
 #include <iostream>
 
@@ -12,24 +10,24 @@ using namespace std;
 
 static constexpr size_t BLOCK_SIZE = 4*1024;
 
-size_t SequentialProcessor::execute(const std::string& filename, const std::string& pattern,
-                WildcardMatch& wcmatch, FileReader& freader, size_t maxLines) {
+SequentialProcessor::SequentialProcessor(size_t maxLines):
+_maxLines(maxLines), _buffer(BLOCK_SIZE * maxLines) {
+    assert(_maxLines > 0);
+    _flines.reserve(_maxLines);
+}
 
-    assert(maxLines > 0);
+size_t SequentialProcessor::execute(const string& filename, const string& pattern,
+                                WildcardMatch& wcmatch, FileReader& freader) {
 
-    freader.open(filename);
+    ScopedFileOpener fopener(freader, filename);
 
-    vector<char> bufferData(BLOCK_SIZE * maxLines);
-    char* buffer = bufferData.data();
-
-    vector<string_view> lines;
-    lines.reserve(maxLines);
+    char* buffer = _buffer.data();
     const bool needsBuffer = freader.needsBuffer();
 
     size_t i, result = 0;
     for(;;) {
-        lines.clear();
-        for(i = 0; i < maxLines; ++i) {
+        _flines.clear();
+        for(i = 0; i < _maxLines; ++i) {
             if(needsBuffer) {
                 freader.setBuffer(buffer + i * BLOCK_SIZE, BLOCK_SIZE);
             }
@@ -37,19 +35,17 @@ size_t SequentialProcessor::execute(const std::string& filename, const std::stri
             if(!line.data()) {
                 break;
             }
-            lines.emplace_back(line);
+            _flines.emplace_back(line);
         }
 
-        if(lines.empty()) {
+        if(_flines.empty()) {
             break;
         }
 
-        result += std::count_if(lines.begin(), lines.end(),
+        result += std::count_if(_flines.begin(), _flines.end(),
             [&](auto& line){ return wcmatch.isMatch(line, pattern); }
         );
     }
-
-    freader.close();
 
     return result;
 }
