@@ -21,6 +21,11 @@ And I implemented this as a single-threaded and as a multi-threaded solutions.
 Also I wanted to play with such paramenters as number of read/filtered
 lines at one time and number of threads.
 
+NOTE: I wrote this code avoiding any memory reallocation during reading and
+filtering. For example for queue in multi-threaded implementation a simple
+fixed size ring/circular buffer is used.
+And all memory buffers are allocated beforehand.
+
 This code is for Linix OS only. Maybe it can work on MacOS but I haven't tried.
 
 To build and run I used my build system like this (from directory playground/fwcmatch):
