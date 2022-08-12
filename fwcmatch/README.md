@@ -1,4 +1,6 @@
 
+## Why
+
 I wanted to make some benchmarks to see some real performance on some real
 task with different solutions and different parameters and methods.
 
@@ -19,7 +21,12 @@ And I implemented this as a single-threaded and as a multi-threaded solutions.
 Also I wanted to play with such paramenters as number of read/filtered
 lines at one time and number of threads.
 
-This implementaion is for Linix OS only.
+This code is for Linix OS only. Maybe it can work on MacOS but I haven't tried.
+
+To build and run I used my build system like this (from directory playground/fwcmatch):
+```
+BENCH_FILENAME="/files/tmp/_unison.log" BENCH_PATTERN="*failed*" zenmake run
+```
 
 ## The results
 
@@ -30,6 +37,7 @@ This implementaion is for Linix OS only.
 - Data storage: NVMe SSD
 - OS: Gentoo Linux (kernel 5.10.27)
 - Filesystem: ext4
+- C++ compiler: g++ 11.2.1 (-std=c++17 -O3)
 - CPU Frequency Scaling is turned off:
   ```
   sudo cpupower frequency-set --governor performance
