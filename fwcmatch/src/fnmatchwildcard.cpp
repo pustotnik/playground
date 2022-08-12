@@ -3,6 +3,8 @@
 
 #include "fnmatchwildcard.h"
 
+thread_local std::string FNMatch::_text;
+
 bool FNMatch::isMatch(const std::string_view& text, const std::string& pattern) const {
 
     if(text.empty() || pattern.empty()) {

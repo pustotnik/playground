@@ -4,6 +4,8 @@
 
 #include "wildcard.h"
 
+// this implemenation is not thread safe
+
 class REMatch final: public WildcardMatch
 {
 public:

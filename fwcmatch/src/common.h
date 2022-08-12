@@ -3,10 +3,12 @@
 #include <cstdio>
 #include <cerrno>
 #include <string>
+#include <string_view>
 #include <vector>
 #include <iostream>
 
-typedef std::vector<std::string> Strings;
+typedef std::string_view         FileLineRef;
+typedef std::vector<FileLineRef> FileLineRefs;
 
 [[ noreturn ]]
 inline void errorAndStop(const std::string& msg, bool useErrno = true) {

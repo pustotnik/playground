@@ -36,7 +36,7 @@ void FStreamReader::close() {
 }
 
 // read next line in file
-std::string_view FStreamReader::readLine() {
+FileLineRef FStreamReader::readLine() {
 
     // It is experimental code and so I don't do correct error handling for all cases
     assert(_stream.is_open());

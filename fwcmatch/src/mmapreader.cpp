@@ -66,7 +66,7 @@ void MMapReader::close() {
 }
 
 // read next line in file
-std::string_view MMapReader::readLine() {
+FileLineRef MMapReader::readLine() {
 
     // It is experimental code and so I don't do correct error handling for all cases
     assert(_file >= 0);
@@ -95,7 +95,7 @@ std::string_view MMapReader::readLine() {
         lineSize = _mapend - _mapptr;
     }
 
-    std::string_view result { _mapptr, lineSize };
+    FileLineRef result { _mapptr, lineSize };
     _mapptr += lineSize + eolOffset;
 
     return result;

@@ -1,4 +1,5 @@
 
+#include <cassert>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -12,6 +13,7 @@
 #include "fnmatchwildcard.h"
 #include "regexwildcard.h"
 #include "seqproc.h"
+#include "prodconsproc.h"
 #include "common.h"
 
 using namespace std;
@@ -30,7 +32,7 @@ void BM_Sequential(benchmark::State& state) {
 
     size_t found = 0;
     for (auto _ : state) {
-        found = processor.execute(benchFileName, benchPattern, wcmatch, freader);
+        found = processor.execute(freader, benchFileName, wcmatch, benchPattern);
         benchmark::DoNotOptimize(found);
     }
 
@@ -40,7 +42,7 @@ void BM_Sequential(benchmark::State& state) {
 static void genSequentialArguments(benchmark::internal::Benchmark* b) {
     b->Arg(1)->Arg(2)->Arg(4)->Arg(20)->Arg(40)
     ->ArgNames({"mlines", })
-    ->Iterations(2)
+    //->Iterations(2)
     ->Unit(benchmark::kMillisecond)
     ->UseRealTime();
 }
@@ -77,6 +79,58 @@ BENCHMARK(BM_Sequential<FStreamReader, REMatch>)
 BENCHMARK(BM_Sequential<MMapReader, REMatch>)
     ->Apply(genSequentialArguments);
 //*/
+
+template<typename FReader, typename WildcardMatch>
+void BM_MTProdCons(benchmark::State& state) {
+
+    const size_t queueSize     = state.range(0);
+    const size_t numOfhreads   = state.range(1);
+    const size_t maxLines      = state.range(2);
+
+    assert(queueSize > 0);
+    assert(numOfhreads > 1);
+    assert(maxLines > 0);
+
+    auto freader   = FReader();
+    auto wcmatch   = WildcardMatch();
+    auto processor = ProdConsProcessor(queueSize, numOfhreads - 1, maxLines);
+
+    size_t found = 0;
+    for (auto _ : state) {
+        found = processor.execute(freader, benchFileName, wcmatch, benchPattern);
+        benchmark::DoNotOptimize(found);
+    }
+
+    state.counters["Count"] = found;
+}
+
+static void genMTProdConsArguments(benchmark::internal::Benchmark* b) {
+    b
+    ->Args({3, 3, 10})
+    ->Args({3, 3, 100})
+    ->Args({1, 4, 100})
+    ->Args({4, 4, 100})
+    ->Args({4, 4, 500})
+    ->Args({8, 4, 500})
+    ->Args({16, 4, 500})
+    ->Args({8, 8, 200})
+    ->Args({8, 8, 500})
+    ->Args({16, 8, 500})
+    ->ArgNames({"qsize", "threads", "mlines" })
+    //->Iterations(2)
+    ->Unit(benchmark::kMillisecond)
+    ->MeasureProcessCPUTime()
+    ->UseRealTime();
+}
+
+BENCHMARK(BM_MTProdCons<FGetsReader, MyWildcardMatch>)
+    ->Apply(genMTProdConsArguments);
+
+BENCHMARK(BM_MTProdCons<FStreamReader, MyWildcardMatch>)
+    ->Apply(genMTProdConsArguments);
+
+BENCHMARK(BM_MTProdCons<MMapReader, MyWildcardMatch>)
+    ->Apply(genMTProdConsArguments);
 
 // Run the benchmarks
 int main(int argc, char** argv) {

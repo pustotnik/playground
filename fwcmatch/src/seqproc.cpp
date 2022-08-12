@@ -16,8 +16,8 @@ _maxLines(maxLines), _buffer(BLOCK_SIZE * maxLines) {
     _flines.reserve(_maxLines);
 }
 
-size_t SequentialProcessor::execute(const string& filename, const string& pattern,
-                                WildcardMatch& wcmatch, FileReader& freader) {
+size_t SequentialProcessor::execute(FileReader& freader, const string& filename,
+                            WildcardMatch& wcmatch, const string& pattern) {
 
     ScopedFileOpener fopener(freader, filename);
 
@@ -35,7 +35,7 @@ size_t SequentialProcessor::execute(const string& filename, const string& patter
             if(!line.data()) {
                 break;
             }
-            _flines.emplace_back(line);
+            _flines.emplace_back(std::move(line));
         }
 
         if(_flines.empty()) {

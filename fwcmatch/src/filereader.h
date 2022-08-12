@@ -2,9 +2,9 @@
 
 #include <cstddef>
 #include <string>
-#include <string_view>
 
 #include "noncopyable.h"
+#include "common.h"
 
 class FileReader: private noncopyable
 {
@@ -22,8 +22,8 @@ public:
     void setBuffer(char* buffer, size_t bufferSize);
 
     // read next line in file
-    // string_view is used to avoid copying
-    virtual std::string_view readLine() = 0;
+    // FileLineRef is used to avoid copying
+    virtual FileLineRef readLine() = 0;
 
 protected:
     char*  _buffer = nullptr;

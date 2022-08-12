@@ -39,7 +39,7 @@ void FGetsReader::close() {
 }
 
 // read next line in file
-std::string_view FGetsReader::readLine() {
+FileLineRef FGetsReader::readLine() {
 
     // It is experimental code and so I don't do correct error handling for all cases
     assert(_file);

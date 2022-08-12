@@ -9,5 +9,5 @@ public:
 
 private:
     // used as a cache to reduce number of memory allocation/deallocation
-    mutable std::string _text;
+    thread_local static std::string _text;
 };

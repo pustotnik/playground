@@ -19,8 +19,8 @@ public:
     bool needsBuffer() const override { return true; } ;
 
     // read next line in file
-    // string_view is used to avoid copying
-    std::string_view readLine() override;
+    // FileLineRef is used to avoid copying
+    FileLineRef readLine() override;
 
 private:
     std::ifstream _stream;
