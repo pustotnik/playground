@@ -14,7 +14,7 @@ C/C++ **fgets**, C++ **iostream** and Linux **mmap**.
 For wildcard matching I used my general implementation of
 the wildcard matching algorithm based on this [solution](https://yucoding.blogspot.com/2013/02/leetcode-question-123-wildcard-matching.html) and the POSIX fnmatch function. Also I implemented wildcard matching with
 C++ standard regex library but it works really slow.
-But I had o purpose to benchmark wildcard algorithms.
+But I had no purpose to benchmark wildcard algorithms.
 And I implemented this as a single-threaded and as a multi-threaded solutions.
 Also I wanted to play with such paramenters as number of read/filtered
 lines at one time and number of threads.
@@ -45,7 +45,7 @@ This implementaion is for Linix OS only.
 I created a 2GB file from my own unison.log and used the
 wildcard pattern \*failed\* for all benchmarks.
 
-I cut off some fields for shortance.
+Some fields were cut off for shortance.
 
 ```
 ----------------------------------------------------------------------------------------------------------------------------------
