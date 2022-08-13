@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <iostream>
 #include <mutex>
-#include <chrono>
 
 #include "prodconsproc.h"
 
@@ -14,25 +13,24 @@ using namespace std;
 static constexpr size_t BLOCK_SIZE = 4*1024;
 
 ProdConsProcessor::ProdConsProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
-_blocksQueue(queueSize), _maxLines(maxLines) {
+_numOfThreads(numOfConsThreads + 1), _maxLines(maxLines),
+// for each block in queue and for each thread for waiting
+_freeBlocks(queueSize + _numOfThreads),
+_blocksQueue(queueSize)  {
 
     assert(queueSize > 0);
     assert(numOfConsThreads > 0);
     assert(maxLines > 0);
 
-    // +1 thread for a file reading
-    auto numOfThreads = numOfConsThreads + 1;
-
-    // for each block in queue and for each thread for waiting
-
-    auto numOfBlocks = queueSize + numOfThreads;
+    const auto numOfBlocks = _freeBlocks.capacity();
+    _blocksHolder.reserve(numOfBlocks);
     for(size_t i = 0; i < numOfBlocks; ++i) {
         LinesBlock blk;
         blk.lines.reserve(maxLines);
         _blocksHolder.push_back(std::move(blk));
     }
 
-    _threads.resize(numOfThreads);
+    _threads.resize(_numOfThreads);
     _counters.resize(numOfConsThreads, 0);
 }
 
@@ -164,9 +162,9 @@ void ProdConsProcessor::freeBlock(ProdConsProcessor::LinesBlockPtr p) {
 
 void ProdConsProcessor::clear() {
 
-    _freeBlocks = {};
-    for(int i = _blocksHolder.size() - 1; i >= 0; --i) {
-        _freeBlocks.push(&_blocksHolder[i]);
+    _freeBlocks.clear();
+    for(auto& block: _blocksHolder) {
+        _freeBlocks.push(&block);
     }
 
     _blocksQueue.clear();

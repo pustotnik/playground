@@ -4,7 +4,6 @@
 #include <queue>
 #include <string>
 #include <vector>
-#include <stack>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
@@ -32,12 +31,11 @@ private:
         FileLineRefs      lines;
     };
 
-    typedef LinesBlock*                                  LinesBlockPtr;
-    typedef std::vector<LinesBlock>                      VectorOfBlocks;
-    typedef std::vector<LinesBlockPtr>                   VectorOfBlockPtrs;
-    typedef std::stack<LinesBlockPtr, VectorOfBlockPtrs> StackOfBlockPtrs;
-    typedef SimpleRingBuffer<LinesBlockPtr>              BlockPtrsRing;
-    typedef std::vector<std::thread>                     Threads;
+    typedef LinesBlock*                     LinesBlockPtr;
+    typedef std::vector<LinesBlock>         VectorOfBlocks;
+    typedef std::vector<LinesBlockPtr>      VectorOfBlockPtrs;
+    typedef SimpleRingBuffer<LinesBlockPtr> BlockPtrsRing;
+    typedef std::vector<std::thread>        Threads;
 
     void readFileLines(FileReader& freader);
     void filterLines(size_t idx, WildcardMatch& wcmatch, std::string pattern);
@@ -47,8 +45,10 @@ private:
 
     void clear();
 
+    size_t                  _numOfThreads;
+    size_t                  _maxLines;
     VectorOfBlocks          _blocksHolder;
-    StackOfBlockPtrs        _freeBlocks;
+    BlockPtrsRing           _freeBlocks;
     BlockPtrsRing           _blocksQueue;
     Threads                 _threads;
     std::vector<size_t>     _counters;
@@ -56,6 +56,5 @@ private:
     std::mutex              _queueMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
-    size_t                  _maxLines;
     bool                    _stop = false;
 };
