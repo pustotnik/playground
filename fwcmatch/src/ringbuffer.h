@@ -13,16 +13,16 @@ class SimpleRingBuffer final: private noncopyable {
 public:
     typedef T Value;
 
-    SimpleRingBuffer(size_t capacity): _buffer(capacity) {
+    explicit SimpleRingBuffer(size_t capacity): _buffer(capacity) {
     }
 
     ~SimpleRingBuffer() {
     }
 
-    bool size() const { return _size; }
-    bool capacity() const { return _buffer.size(); }
-    bool empty() const { return 0 == size(); }
-    bool full() const { return size() == capacity(); }
+    [[nodiscard]] size_t size() const { return _size; }
+    [[nodiscard]] size_t capacity() const { return _buffer.size(); }
+    [[nodiscard]] bool empty() const { return 0 == size(); }
+    [[nodiscard]] bool full() const { return size() == capacity(); }
 
     void clear() {
         _head = _tail = _size = 0;
@@ -45,8 +45,8 @@ public:
         --_size;
     }
 
-    Value& top() { assert(!empty()); return _buffer[_head]; }
-    Value const& top() const { assert(!empty()); return _buffer[_head]; }
+    [[nodiscard]] Value& top() { assert(!empty()); return _buffer[_head]; }
+    [[nodiscard]] Value const& top() const { assert(!empty()); return _buffer[_head]; }
 
 private:
     std::vector<T> _buffer;
