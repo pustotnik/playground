@@ -54,7 +54,8 @@ private:
     std::vector<size_t>     _counters;
     std::mutex              _blockMutex;
     std::mutex              _queueMutex;
-    std::condition_variable _queueCondVar;
+    std::condition_variable _cvNonEmpty;
+    std::condition_variable _cvNonFull;
     size_t                  _maxLines;
     bool                    _stop = false;
 };

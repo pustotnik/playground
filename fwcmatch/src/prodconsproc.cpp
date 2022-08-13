@@ -99,15 +99,15 @@ void ProdConsProcessor::readFileLines(FileReader& freader) {
 
         unique_lock<mutex> lock(_queueMutex);
         if(_blocksQueue.full()) {
-            _queueCondVar.wait(lock, [&](){ return !_blocksQueue.full(); });
+            _cvNonFull.wait(lock, [&](){ return !_blocksQueue.full(); });
         }
         _blocksQueue.push(block);
-        _queueCondVar.notify_all();
+        _cvNonEmpty.notify_one();
     }
 
     scoped_lock lock(_queueMutex);
     _stop = true;
-    _queueCondVar.notify_all();
+    _cvNonEmpty.notify_all();
 }
 
 void ProdConsProcessor::filterLines(size_t idx,
@@ -120,7 +120,7 @@ void ProdConsProcessor::filterLines(size_t idx,
 
         unique_lock<mutex> lock(_queueMutex);
         if(_blocksQueue.empty()) {
-            _queueCondVar.wait(lock, [&](){ return !_blocksQueue.empty() || _stop; });
+            _cvNonEmpty.wait(lock, [&](){ return !_blocksQueue.empty() || _stop; });
             if(_stop) {
                 break;
             }
@@ -129,7 +129,7 @@ void ProdConsProcessor::filterLines(size_t idx,
         block = _blocksQueue.top();
         _blocksQueue.pop();
 
-        _queueCondVar.notify_all();
+        _cvNonFull.notify_one();
         lock.unlock();
 
         assert(block);
