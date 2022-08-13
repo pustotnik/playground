@@ -19,12 +19,12 @@ public:
     ~SimpleRingBuffer() {
     }
 
-    [[nodiscard]] size_t size() const { return _size; }
-    [[nodiscard]] size_t capacity() const { return _buffer.size(); }
-    [[nodiscard]] bool empty() const { return 0 == size(); }
-    [[nodiscard]] bool full() const { return size() == capacity(); }
+    [[nodiscard]] size_t size() const noexcept { return _size; }
+    [[nodiscard]] size_t capacity() const noexcept { return _buffer.size(); }
+    [[nodiscard]] bool empty() const noexcept { return 0 == size(); }
+    [[nodiscard]] bool full() const noexcept { return size() == capacity(); }
 
-    void clear() {
+    void clear() noexcept {
         _head = _tail = _size = 0;
     }
 
@@ -54,7 +54,7 @@ private:
     size_t         _tail = 0;
     size_t         _size = 0;
 
-    void increment(size_t& idx) {
+    void increment(size_t& idx) noexcept {
         if(++idx >= capacity()) {
             idx = 0;
         }
