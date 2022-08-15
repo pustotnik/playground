@@ -26,8 +26,8 @@ public:
     virtual FileLineRef readLine() = 0;
 
 protected:
-    char*  _buffer = nullptr;
-    size_t _bufferSize = 0;
+    char*  _buffer     { nullptr };
+    size_t _bufferSize { 0 };
 };
 
 inline void FileReader::setBuffer(char* buffer, size_t bufferSize) {

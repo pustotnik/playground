@@ -50,9 +50,9 @@ public:
 
 private:
     std::vector<T> _buffer;
-    size_t         _head = 0;
-    size_t         _tail = 0;
-    size_t         _size = 0;
+    size_t         _head { 0 };
+    size_t         _tail { 0 };
+    size_t         _size { 0 };
 
     void increment(size_t& idx) noexcept {
         if(++idx >= capacity()) {

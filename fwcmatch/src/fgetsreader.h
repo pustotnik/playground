@@ -24,5 +24,5 @@ public:
     FileLineRef readLine() override;
 
 private:
-    FILE*  _file = nullptr;
+    FILE*  _file { nullptr };
 };
