@@ -14,6 +14,7 @@
 #include "regexwildcard.h"
 #include "seqproc.h"
 #include "prodconsproc.h"
+#include "prodconsgproc.h"
 #include "common.h"
 
 using namespace std;
@@ -80,8 +81,8 @@ BENCHMARK(BM_Sequential<MMapReader, REMatch>)
     ->Apply(genSequentialArguments);
 //*/
 
-template<typename FReader, typename WildcardMatch>
-void BM_MTProdCons(benchmark::State& state) {
+template<typename Processor, typename FReader, typename WildcardMatch>
+void MTProdConsTempl(benchmark::State& state) {
 
     const size_t queueSize     = state.range(0);
     const size_t numOfhreads   = state.range(1);
@@ -93,7 +94,7 @@ void BM_MTProdCons(benchmark::State& state) {
 
     auto freader   = FReader();
     auto wcmatch   = WildcardMatch();
-    auto processor = ProdConsProcessor(queueSize, numOfhreads - 1, maxLines);
+    auto processor = Processor(queueSize, numOfhreads - 1, maxLines);
 
     size_t found = 0;
     for (auto _ : state) {
@@ -104,8 +105,20 @@ void BM_MTProdCons(benchmark::State& state) {
     state.counters["Count"] = found;
 }
 
+template<typename FReader, typename WildcardMatch>
+void BM_MTProdCons(benchmark::State& state) {
+    MTProdConsTempl<ProdConsProcessor, FReader, WildcardMatch>(state);
+}
+
+template<typename FReader, typename WildcardMatch>
+void BM_MTProdConsG(benchmark::State& state) {
+    MTProdConsTempl<ProdConsGProcessor, FReader, WildcardMatch>(state);
+}
+
 static void genMTProdConsArguments(benchmark::internal::Benchmark* b) {
     b
+    ->Args({2, 2, 10})
+    ->Args({2, 2, 100})
     ->Args({3, 3, 10})
     ->Args({3, 3, 100})
     ->Args({1, 4, 100})
@@ -130,6 +143,15 @@ BENCHMARK(BM_MTProdCons<FStreamReader, MyWildcardMatch>)
     ->Apply(genMTProdConsArguments);
 
 BENCHMARK(BM_MTProdCons<MMapReader, MyWildcardMatch>)
+    ->Apply(genMTProdConsArguments);
+
+BENCHMARK(BM_MTProdConsG<FGetsReader, MyWildcardMatch>)
+    ->Apply(genMTProdConsArguments);
+
+BENCHMARK(BM_MTProdConsG<FStreamReader, MyWildcardMatch>)
+    ->Apply(genMTProdConsArguments);
+
+BENCHMARK(BM_MTProdConsG<MMapReader, MyWildcardMatch>)
     ->Apply(genMTProdConsArguments);
 
 // Run the benchmarks

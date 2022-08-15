@@ -6,15 +6,17 @@ task with different solutions and different parameters and methods.
 
 ## The task
 
-We read some big (it is important) log file line by line then filter these
+We read one some big (it is important) log file line by line then filter these
 lines with some wildcard pattern and count all filtered lines.
 One detail of this task is necessity to read file line by line, not block by block.
-So we cannot know where a line is ended before reading that line.
+So we cannot know where a line is ended before reading that line. As result we
+cannot read such a file in more than one thread if we're reading this file the first time.
 
 I decided to use at least three methods for a file reading:
 C/C++ **fgets**, C++ **iostream** and Linux **mmap**.
 For wildcard matching I used my general implementation of
-the wildcard matching algorithm based on this [solution](https://yucoding.blogspot.com/2013/02/leetcode-question-123-wildcard-matching.html) and the POSIX fnmatch function. Also I implemented wildcard matching with
+the wildcard matching algorithm based on this [solution](https://yucoding.blogspot.com/2013/02/leetcode-question-123-wildcard-matching.html) and the POSIX fnmatch function.
+Also I implemented wildcard matching with
 C++ standard regex library but it works really slow.
 But I had no purpose to benchmark wildcard algorithms.
 And I implemented this as a single-threaded and as a multi-threaded solutions.
@@ -42,7 +44,7 @@ BENCH_FILENAME="/files/tmp/_unison.log" BENCH_PATTERN="*failed*" zenmake run
 - Data storage: NVMe SSD
 - OS: Gentoo Linux (kernel 5.10.27)
 - Filesystem: ext4
-- C++ compiler: g++ 11.2.1 (-std=c++17 -O3)
+- C++ compiler: g++ 11.2.1 (-std=c++20 -O3 -fno-rtti -flto)
 - CPU Frequency Scaling is turned off:
   ```
   sudo cpupower frequency-set --governor performance
@@ -129,7 +131,7 @@ BM_MTProdCons<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:500/process
 
 - BM_Sequential - single-threaded implementation
 - BM_MTProdCons - multi-threaded implementation as almost classical Producer-Consumer problem using
-                  mutex and condition variable.
+                  mutex and condition variable. It is some variant of single producer and multiple consumers.
 - FGetsReader - the fgets is used
 - FStreamReader - the iostream is used
 - MMapReader - the mmap is ised
@@ -141,6 +143,9 @@ BM_MTProdCons<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:500/process
 - column 'CPU' means sum of time from all used CPUs.
 
 ## Some observations
+All next observations are actual only for **these** benchmarks on **this** system.
+On different OS/hardware/implementation the results can be different.
+
 - C++ iostream can work a little bit faster then C fgets.
 - FNMatch works a little bit slower than MyWildcardMatch just because fnmatch
   requires C string terminated with '\0' and I had to make copy of each file
@@ -150,7 +155,7 @@ BM_MTProdCons<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:500/process
   But it is important for multi-threaded implementation.
 - It is optimal to set size of queue to number of threads.
 - Increasing number of threads in multi-threaded implementation is not always
-  optimal decision.
+  optimal decision. But it is because file I/O is bottleneck for this task.
 
 ## About mmap
 The **mmap** in these benchmarks are fastest but you should to know that it was warm run and the

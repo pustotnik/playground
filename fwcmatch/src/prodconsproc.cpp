@@ -1,65 +1,30 @@
 
 #include <cassert>
-#include <cstddef>
-#include <cstring>
 #include <algorithm>
-#include <iostream>
-#include <mutex>
 
 #include "prodconsproc.h"
 
 using namespace std;
 
-static constexpr size_t BLOCK_SIZE = 4*1024;
-
 ProdConsProcessor::ProdConsProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
-_numOfThreads(numOfConsThreads + 1), _maxLines(maxLines),
-// for each block in queue and for each thread for waiting
-_freeBlocks(queueSize + _numOfThreads),
-_blocksQueue(queueSize)  {
+BaseProdConsProcessor(numOfConsThreads, maxLines,
+    // for each block in queue and for each thread for waiting
+    queueSize + numOfConsThreads + 1),
+_blocksQueue(queueSize), _counters(numOfConsThreads, 0)  {
 
     assert(queueSize > 0);
-    assert(numOfConsThreads > 0);
-    assert(maxLines > 0);
-
-    const auto numOfBlocks = _freeBlocks.capacity();
-    _blocksHolder.reserve(numOfBlocks);
-    for(size_t i = 0; i < numOfBlocks; ++i) {
-        LinesBlock blk;
-        blk.lines.reserve(maxLines);
-        _blocksHolder.push_back(std::move(blk));
-    }
-
-    _threads.resize(_numOfThreads);
-    _counters.resize(numOfConsThreads, 0);
 }
 
-size_t ProdConsProcessor::execute(FileReader& freader, const string& filename,
-                                WildcardMatch& wcmatch, const string& pattern) {
+void ProdConsProcessor::init() {
 
     _stop = false;
-    clear();
+    _blocksQueue.clear();
 
-    if(freader.needsBuffer()) {
-        for(auto& block: _blocksHolder) {
-            block.buffer.resize(BLOCK_SIZE * _maxLines);
-        }
-    }
+    // std::fill works too slowly :(
+    _counters.assign(_counters.size(), 0);
+}
 
-    ScopedFileOpener fopener(freader, filename);
-
-    _threads[0] = thread(&ProdConsProcessor::readFileLines,
-                                            this, std::ref(freader));
-
-    for(size_t i = 1; i < _threads.size(); ++i) {
-        _threads[i] = thread(&ProdConsProcessor::filterLines,
-                            this, i-1, std::ref(wcmatch), pattern);
-    }
-
-    for(auto& t: _threads) {
-        t.join();
-    }
-
+size_t ProdConsProcessor::calcFinalResult() const {
     size_t result = 0;
     for(auto c: _counters) {
         result += c;
@@ -69,29 +34,11 @@ size_t ProdConsProcessor::execute(FileReader& freader, const string& filename,
 
 void ProdConsProcessor::readFileLines(FileReader& freader) {
 
-    const bool needsBuffer = freader.needsBuffer();
-
-    size_t i;
     for(;;) {
 
-        auto block = allocBlock();
-        assert(block);
-        auto &lines = block->lines;
-
-        lines.clear();
-        for(i = 0; i < _maxLines; ++i) {
-            if(needsBuffer) {
-                auto* buffer = block->buffer.data();
-                freader.setBuffer(buffer + i * BLOCK_SIZE, BLOCK_SIZE);
-            }
-            auto line = freader.readLine();
-            if(!line.data()) {
-                break;
-            }
-            lines.push_back(std::move(line));
-        }
-
-        if(lines.empty()) {
+        auto block = readInLinesBlock(freader);
+        if(block->lines.empty()) {
+            // end of file
             break;
         }
 
@@ -126,48 +73,14 @@ void ProdConsProcessor::filterLines(size_t idx,
 
         block = _blocksQueue.top();
         _blocksQueue.pop();
-
-        _cvNonFull.notify_one();
+        if(_blocksQueue.empty()) {
+            _cvNonFull.notify_one();
+        }
         lock.unlock();
 
         assert(block);
-
-        auto& lines = block->lines;
-        counter += count_if(lines.cbegin(), lines.cend(),
-            [&](auto const& line){ return wcmatch.isMatch(line, pattern); }
-        );
-
-        lines.clear();
-        freeBlock(block);
+        counter += filterBlockAndFree(wcmatch, pattern, *block);
     }
 
     _counters[idx] = counter;
-}
-
-ProdConsProcessor::LinesBlockPtr ProdConsProcessor::allocBlock() {
-    scoped_lock lock(_blockMutex);
-    if(_freeBlocks.empty()) {
-        return nullptr;
-    }
-
-    auto p = _freeBlocks.top();
-    _freeBlocks.pop();
-    return p;
-}
-
-void ProdConsProcessor::freeBlock(ProdConsProcessor::LinesBlockPtr p) {
-    scoped_lock lock(_blockMutex);
-    _freeBlocks.push(p);
-}
-
-void ProdConsProcessor::clear() {
-
-    _freeBlocks.clear();
-    for(auto& block: _blocksHolder) {
-        _freeBlocks.push(&block);
-    }
-
-    _blocksQueue.clear();
-
-    std::memset(_counters.data(), 0, _counters.size() * sizeof(_counters[0]));
 }

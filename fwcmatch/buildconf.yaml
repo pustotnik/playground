@@ -10,22 +10,32 @@ tasks:
 configure:
   - do: check-libs
 
-CMN_GCC_FLAGS: -Wall -Wextra -std=c++17 -fno-rtti #-fsanitize=address #-flto #-march=native
-#CMN_LINK_FLAGS: -flto
-CMN_LINK_FLAGS: " "
-#CMN_LINK_FLAGS: -fsanitize=address
+#CMN_CXXFLAGS: -Wall -Wextra -std=c++17 -fno-rtti -flto
+CMN_CXXFLAGS: -Wall -Wextra -std=c++20 -fno-rtti -flto
+CMN_LINK_FLAGS: -flto
+
+SANIT_CMN_CXXFLAGS: $CMN_CXXFLAGS -fsanitize=address
+SANIT_CMN_LINK_FLAGS: $CMN_LINK_FLAGS -fsanitize=address
 
 buildtypes:
   default : release
+
   release:
-    toolchain : auto-c++
+    #toolchain : auto-c++
     #toolchain : clang++
-    #cxxflags: $CMN_GCC_FLAGS -O2
-    cxxflags: $CMN_GCC_FLAGS -O3
+    #cxxflags: $CMN_CXXFLAGS -O2
+    cxxflags: $CMN_CXXFLAGS -O3
     linkflags: $CMN_LINK_FLAGS
     #defines: NDEBUG=1
 
   debug:
-    toolchain : auto-c++
     cxxflags: $CMN_GCC_FLAGS -O0 -g
     linkflags: $CMN_LINK_FLAGS
+
+  sanit-rls:
+    cxxflags: $SANIT_CMN_CXXFLAGS -O3
+    linkflags: $SANIT_CMN_CXXFLAGS
+
+  sanit-dbg:
+    cxxflags: $SANIT_CMN_CXXFLAGS -O0 -g
+    linkflags: $SANIT_CMN_CXXFLAGS
