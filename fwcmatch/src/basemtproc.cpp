@@ -2,13 +2,13 @@
 #include <cassert>
 #include <algorithm>
 
-#include "baseprodconsproc.h"
+#include "basemtproc.h"
 
 using namespace std;
 
 static constexpr size_t BLOCK_SIZE = 4*1024;
 
-BaseProdConsProcessor::BaseProdConsProcessor(size_t numOfConsThreads, size_t maxLines, size_t numOfBlocks):
+BaseMTProcessor::BaseMTProcessor(size_t numOfConsThreads, size_t maxLines, size_t numOfBlocks):
 _numOfThreads(numOfConsThreads + 1), _maxLines(maxLines),
 _freeBlocks(numOfBlocks) {
 
@@ -25,10 +25,10 @@ _freeBlocks(numOfBlocks) {
     _threads.resize(_numOfThreads);
 }
 
-BaseProdConsProcessor::~BaseProdConsProcessor() {
+BaseMTProcessor::~BaseMTProcessor() {
 }
 
-size_t BaseProdConsProcessor::execute(FileReader& freader, const string& filename,
+size_t BaseMTProcessor::execute(FileReader& freader, const string& filename,
                                 WildcardMatch& wcmatch, const string& pattern) {
 
     doInit();
@@ -42,11 +42,11 @@ size_t BaseProdConsProcessor::execute(FileReader& freader, const string& filenam
 
     ScopedFileOpener fopener(freader, filename);
 
-    _threads[0] = thread(&BaseProdConsProcessor::readFileLines,
+    _threads[0] = thread(&BaseMTProcessor::readFileLines,
                                             this, std::ref(freader));
 
     for(size_t i = 1; i < _threads.size(); ++i) {
-        _threads[i] = thread(&BaseProdConsProcessor::filterLines,
+        _threads[i] = thread(&BaseMTProcessor::filterLines,
                             this, i-1, std::ref(wcmatch), pattern);
     }
 
@@ -57,8 +57,8 @@ size_t BaseProdConsProcessor::execute(FileReader& freader, const string& filenam
     return calcFinalResult();
 }
 
-BaseProdConsProcessor::LinesBlockPtr
-BaseProdConsProcessor::readInLinesBlock(FileReader& freader) {
+BaseMTProcessor::LinesBlockPtr
+BaseMTProcessor::readInLinesBlock(FileReader& freader) {
 
     const bool needsBuffer = freader.needsBuffer();
 
@@ -82,7 +82,7 @@ BaseProdConsProcessor::readInLinesBlock(FileReader& freader) {
     return block;
 }
 
-void BaseProdConsProcessor::doInit() {
+void BaseMTProcessor::doInit() {
 
     init();
 

@@ -13,8 +13,8 @@
 #include "fnmatchwildcard.h"
 #include "regexwildcard.h"
 #include "seqproc.h"
-#include "prodconsproc.h"
-#include "prodconsgproc.h"
+#include "mtcondvarproc.h"
+#include "mtlockfreeproc.h"
 #include "common.h"
 
 using namespace std;
@@ -106,16 +106,16 @@ void MTProdConsTempl(benchmark::State& state) {
 }
 
 template<typename FReader, typename WildcardMatch>
-void BM_MTProdCons(benchmark::State& state) {
-    MTProdConsTempl<ProdConsProcessor, FReader, WildcardMatch>(state);
+void BM_MTCondVar(benchmark::State& state) {
+    MTProdConsTempl<MTCondVarProcessor, FReader, WildcardMatch>(state);
 }
 
 template<typename FReader, typename WildcardMatch>
-void BM_MTProdConsG(benchmark::State& state) {
-    MTProdConsTempl<ProdConsGProcessor, FReader, WildcardMatch>(state);
+void BM_MTLockFree(benchmark::State& state) {
+    MTProdConsTempl<MTLockFreeProcessor, FReader, WildcardMatch>(state);
 }
 
-static void genMTProdConsArguments(benchmark::internal::Benchmark* b) {
+static void genMultithreadingArguments(benchmark::internal::Benchmark* b) {
     b
     ->Args({2, 2, 10})
     ->Args({2, 2, 100})
@@ -136,23 +136,23 @@ static void genMTProdConsArguments(benchmark::internal::Benchmark* b) {
     ->UseRealTime();
 }
 
-BENCHMARK(BM_MTProdCons<FGetsReader, MyWildcardMatch>)
-    ->Apply(genMTProdConsArguments);
+BENCHMARK(BM_MTCondVar<FGetsReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
 
-BENCHMARK(BM_MTProdCons<FStreamReader, MyWildcardMatch>)
-    ->Apply(genMTProdConsArguments);
+BENCHMARK(BM_MTCondVar<FStreamReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
 
-BENCHMARK(BM_MTProdCons<MMapReader, MyWildcardMatch>)
-    ->Apply(genMTProdConsArguments);
+BENCHMARK(BM_MTCondVar<MMapReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
 
-BENCHMARK(BM_MTProdConsG<FGetsReader, MyWildcardMatch>)
-    ->Apply(genMTProdConsArguments);
+BENCHMARK(BM_MTLockFree<FGetsReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
 
-BENCHMARK(BM_MTProdConsG<FStreamReader, MyWildcardMatch>)
-    ->Apply(genMTProdConsArguments);
+BENCHMARK(BM_MTLockFree<FStreamReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
 
-BENCHMARK(BM_MTProdConsG<MMapReader, MyWildcardMatch>)
-    ->Apply(genMTProdConsArguments);
+BENCHMARK(BM_MTLockFree<MMapReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
 
 // Run the benchmarks
 int main(int argc, char** argv) {

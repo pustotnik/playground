@@ -12,12 +12,12 @@
 #include "wildcard.h"
 #include "filereader.h"
 
-class BaseProdConsProcessor: private noncopyable
+class BaseMTProcessor: private noncopyable
 {
 public:
 
-    BaseProdConsProcessor(size_t numOfConsThreads, size_t maxLines, size_t numOfBlocks);
-    virtual ~BaseProdConsProcessor();
+    BaseMTProcessor(size_t numOfConsThreads, size_t maxLines, size_t numOfBlocks);
+    virtual ~BaseMTProcessor();
 
     size_t execute(FileReader& freader, const std::string& filename,
                     WildcardMatch& wcmatch, const std::string& pattern);
@@ -68,7 +68,7 @@ private:
     std::mutex              _blockMutex;
 };
 
-inline size_t BaseProdConsProcessor::filterBlockAndFree(WildcardMatch& wcmatch,
+inline size_t BaseMTProcessor::filterBlockAndFree(WildcardMatch& wcmatch,
                                         std::string pattern, LinesBlock& block) {
 
     auto& lines = block.lines;
@@ -82,7 +82,7 @@ inline size_t BaseProdConsProcessor::filterBlockAndFree(WildcardMatch& wcmatch,
     return counter;
 }
 
-inline BaseProdConsProcessor::LinesBlockPtr BaseProdConsProcessor::allocBlock() {
+inline BaseMTProcessor::LinesBlockPtr BaseMTProcessor::allocBlock() {
     std::scoped_lock lock(_blockMutex);
     if(_freeBlocks.empty()) {
         return nullptr;
@@ -93,7 +93,7 @@ inline BaseProdConsProcessor::LinesBlockPtr BaseProdConsProcessor::allocBlock() 
     return p;
 }
 
-inline void BaseProdConsProcessor::freeBlock(BaseProdConsProcessor::LinesBlockPtr p) {
+inline void BaseMTProcessor::freeBlock(BaseMTProcessor::LinesBlockPtr p) {
     std::scoped_lock lock(_blockMutex);
     _freeBlocks.push(p);
 }

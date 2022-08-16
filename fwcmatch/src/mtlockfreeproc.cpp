@@ -2,12 +2,12 @@
 #include <cassert>
 #include <thread>
 
-#include "prodconsgproc.h"
+#include "mtlockfreeproc.h"
 
 using namespace std;
 
-ProdConsGProcessor::ProdConsGProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
-BaseProdConsProcessor(numOfConsThreads, maxLines,
+MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
+BaseMTProcessor(numOfConsThreads, maxLines,
     // for each block in queue and for each thread for waiting
     (queueSize + 1) * (numOfConsThreads + 1)) {
 
@@ -19,7 +19,7 @@ BaseProdConsProcessor(numOfConsThreads, maxLines,
     }
 }
 
-void ProdConsGProcessor::init() {
+void MTLockFreeProcessor::init() {
 
     _stop.store(false, memory_order_release);
 
@@ -28,7 +28,7 @@ void ProdConsGProcessor::init() {
     }
 }
 
-size_t ProdConsGProcessor::calcFinalResult() const {
+size_t MTLockFreeProcessor::calcFinalResult() const {
     size_t result = 0;
     for(auto const& consInfo: _consThreadInfo) {
         result += consInfo->counter;
@@ -36,7 +36,7 @@ size_t ProdConsGProcessor::calcFinalResult() const {
     return result;
 }
 
-void ProdConsGProcessor::readFileLines(FileReader& freader) {
+void MTLockFreeProcessor::readFileLines(FileReader& freader) {
 
     const auto numOfConsThreads = _consThreadInfo.size();
     const size_t maxFailedPushes = numOfConsThreads * 2;
@@ -76,7 +76,7 @@ void ProdConsGProcessor::readFileLines(FileReader& freader) {
     _stop.store(true, memory_order_release);
 }
 
-void ProdConsGProcessor::filterLines(size_t idx,
+void MTLockFreeProcessor::filterLines(size_t idx,
                             WildcardMatch& wcmatch, string pattern) {
 
     size_t counter = 0;

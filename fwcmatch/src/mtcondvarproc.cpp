@@ -2,12 +2,12 @@
 #include <cassert>
 #include <algorithm>
 
-#include "prodconsproc.h"
+#include "mtcondvarproc.h"
 
 using namespace std;
 
-ProdConsProcessor::ProdConsProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
-BaseProdConsProcessor(numOfConsThreads, maxLines,
+MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
+BaseMTProcessor(numOfConsThreads, maxLines,
     // for each block in queue and for each thread for waiting
     queueSize + numOfConsThreads + 1),
 _blocksQueue(queueSize), _counters(numOfConsThreads, 0)  {
@@ -15,7 +15,7 @@ _blocksQueue(queueSize), _counters(numOfConsThreads, 0)  {
     assert(queueSize > 0);
 }
 
-void ProdConsProcessor::init() {
+void MTCondVarProcessor::init() {
 
     _stop = false;
     _blocksQueue.clear();
@@ -24,7 +24,7 @@ void ProdConsProcessor::init() {
     _counters.assign(_counters.size(), 0);
 }
 
-size_t ProdConsProcessor::calcFinalResult() const {
+size_t MTCondVarProcessor::calcFinalResult() const {
     size_t result = 0;
     for(auto c: _counters) {
         result += c;
@@ -32,7 +32,7 @@ size_t ProdConsProcessor::calcFinalResult() const {
     return result;
 }
 
-void ProdConsProcessor::readFileLines(FileReader& freader) {
+void MTCondVarProcessor::readFileLines(FileReader& freader) {
 
     for(;;) {
 
@@ -55,7 +55,7 @@ void ProdConsProcessor::readFileLines(FileReader& freader) {
     _cvNonEmpty.notify_all();
 }
 
-void ProdConsProcessor::filterLines(size_t idx,
+void MTCondVarProcessor::filterLines(size_t idx,
                             WildcardMatch& wcmatch, string pattern) {
 
     size_t counter = 0;

@@ -6,7 +6,7 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "baseprodconsproc.h"
+#include "basemtproc.h"
 
 /*
 This class implements strategy of solving the problem with mutexes and
@@ -14,10 +14,10 @@ condition variables. There is no memory reallocation during processing and
 it uses ring buffer for the queue of data between producer and consumers.
 */
 
-class ProdConsProcessor final: public BaseProdConsProcessor
+class MTCondVarProcessor final: public BaseMTProcessor
 {
 public:
-    ProdConsProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines);
+    MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines);
 
 private:
 

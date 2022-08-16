@@ -5,7 +5,7 @@
 #include <atomic>
 
 #include "wfringbuffer.h"
-#include "baseprodconsproc.h"
+#include "basemtproc.h"
 
 /*
 This class implements strategy of solving the problem as a group of
@@ -16,10 +16,10 @@ these ring buffers are full or empty.
 
 There is no memory reallocation during processing.
 */
-class ProdConsGProcessor final: public BaseProdConsProcessor
+class MTLockFreeProcessor final: public BaseMTProcessor
 {
 public:
-    ProdConsGProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines);
+    MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines);
 
 private:
 
