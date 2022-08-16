@@ -1,6 +1,7 @@
 
 #include <cassert>
 #include <algorithm>
+#include <numeric>
 
 #include "mtcondvarproc.h"
 
@@ -25,11 +26,8 @@ void MTCondVarProcessor::init() {
 }
 
 size_t MTCondVarProcessor::calcFinalResult() const {
-    size_t result = 0;
-    for(auto c: _counters) {
-        result += c;
-    }
-    return result;
+    return std::accumulate(_counters.begin(), _counters.end(),
+                                decltype(_counters)::value_type(0));
 }
 
 void MTCondVarProcessor::readFileLines(FileReader& freader) {
