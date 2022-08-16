@@ -35,6 +35,8 @@ To build and run I used my build system like this (from directory playground/fwc
 BENCH_FILENAME="/files/tmp/_unison.log" BENCH_PATTERN="*failed*" zenmake run
 ```
 
+But CMakeLists.txt for cmake build system is also provided.
+
 ## The results
 
 #### Testing environment
