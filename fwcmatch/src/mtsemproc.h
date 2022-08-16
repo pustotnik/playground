@@ -31,9 +31,9 @@ private:
     size_t calcFinalResult() const override;
     void init() override;
 
-    BlockPtrsRing       _blocksQueue;
-    std::vector<size_t> _counters;
-    std::mutex          _queueMutex;
+    BlockPtrsRing              _blocksQueue;
+    std::vector<size_t>        _counters;
+    std::mutex                 _queueMutex;
     std::unique_ptr<Semaphore> _semEmpty;
     std::unique_ptr<Semaphore> _semFull;
 };
