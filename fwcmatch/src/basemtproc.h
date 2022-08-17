@@ -30,7 +30,7 @@ protected:
         FileLineRefs      lines;
     };
 
-    typedef LinesBlock* LinesBlockPtr;
+    using LinesBlockPtr = LinesBlock*;
 
     // must be used in readFileLines
     LinesBlockPtr readInLinesBlock(FileReader& freader);
@@ -39,9 +39,9 @@ protected:
     size_t filterBlockAndFree(WildcardMatch& wcmatch, std::string pattern, LinesBlock& block);
 
 private:
-    typedef std::vector<LinesBlock>           VectorOfBlocks;
-    typedef SimpleRingBuffer<LinesBlockPtr>   BlockPtrsRing;
-    typedef std::vector<std::thread>          Threads;
+    using VectorOfBlocks = std::vector<LinesBlock>;
+    using BlockPtrsRing  = SimpleRingBuffer<LinesBlockPtr>;
+    using Threads        = std::vector<std::thread>;
 
     // it is called in the 'execute' method in the beginning (so threads haven't started yet)
     virtual void init() = 0;

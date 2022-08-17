@@ -15,7 +15,7 @@
 template <typename T>
 class WFSimpleRingBuffer final: private noncopyable {
 public:
-    typedef T Value;
+    using Value = T;
 
     explicit WFSimpleRingBuffer(size_t capacity):
     _buffer(capacity + 1), _capacity(capacity + 1) {

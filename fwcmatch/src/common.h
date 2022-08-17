@@ -7,8 +7,8 @@
 #include <vector>
 #include <iostream>
 
-typedef std::string_view         FileLineRef;
-typedef std::vector<FileLineRef> FileLineRefs;
+using FileLineRef  = std::string_view;
+using FileLineRefs = std::vector<FileLineRef>;
 
 [[ noreturn ]]
 inline void errorAndStop(const std::string& msg, bool useErrno = true) {

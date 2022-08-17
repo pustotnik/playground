@@ -21,7 +21,7 @@ public:
 
 private:
 
-    typedef SimpleRingBuffer<LinesBlockPtr> BlockPtrsRing;
+    using BlockPtrsRing = SimpleRingBuffer<LinesBlockPtr>;
 
     void readFileLines(FileReader& freader) override;
     void filterLines(size_t idx, WildcardMatch& wcmatch, std::string pattern) override;

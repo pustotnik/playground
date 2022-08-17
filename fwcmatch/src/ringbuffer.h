@@ -11,7 +11,7 @@
 template <typename T>
 class SimpleRingBuffer final: private noncopyable {
 public:
-    typedef T Value;
+    using Value = T;
 
     explicit SimpleRingBuffer(size_t capacity): _buffer(capacity) {
     }

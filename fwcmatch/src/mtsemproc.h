@@ -22,8 +22,8 @@ public:
 
 private:
 
-    typedef SimpleRingBuffer<LinesBlockPtr> BlockPtrsRing;
-    typedef std::counting_semaphore<>       Semaphore;
+    using BlockPtrsRing = SimpleRingBuffer<LinesBlockPtr>;
+    using Semaphore     = std::counting_semaphore<>;
 
     void readFileLines(FileReader& freader) override;
     void filterLines(size_t idx, WildcardMatch& wcmatch, std::string pattern) override;

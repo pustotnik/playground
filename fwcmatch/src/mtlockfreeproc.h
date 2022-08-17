@@ -23,7 +23,7 @@ public:
 
 private:
 
-    typedef WFSimpleRingBuffer<LinesBlockPtr> WFBlockPtrsRing; // wait free ring buffer
+    using WFBlockPtrsRing = WFSimpleRingBuffer<LinesBlockPtr>; // wait free ring buffer
 
     // specific info for each consumer's thread
     struct ConsumerInfo final {
@@ -39,8 +39,8 @@ private:
         }
     };
 
-    typedef std::unique_ptr<ConsumerInfo> ConsumerInfoUPtr;
-    typedef std::vector<ConsumerInfoUPtr> VectorOfConsumerInfo;
+    using ConsumerInfoUPtr     = std::unique_ptr<ConsumerInfo>;
+    using VectorOfConsumerInfo = std::vector<ConsumerInfoUPtr>;
 
     void readFileLines(FileReader& freader) override;
     void filterLines(size_t idx, WildcardMatch& wcmatch, std::string pattern) override;
