@@ -54,7 +54,7 @@ void MTCondVarProcessor::readFileLines(FileReader& freader) {
 }
 
 void MTCondVarProcessor::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, string pattern) {
+                            WildcardMatch& wcmatch, const string& pattern) {
 
     size_t counter = 0;
     LinesBlockPtr block = nullptr;

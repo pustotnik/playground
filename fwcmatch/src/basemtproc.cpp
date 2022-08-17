@@ -47,7 +47,7 @@ size_t BaseMTProcessor::execute(FileReader& freader, const string& filename,
 
     for(size_t i = 1; i < _threads.size(); ++i) {
         _threads[i] = thread(&BaseMTProcessor::filterLines,
-                            this, i-1, std::ref(wcmatch), pattern);
+                            this, i-1, std::ref(wcmatch), std::cref(pattern));
     }
 
     for(auto& t: _threads) {

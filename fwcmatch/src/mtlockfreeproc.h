@@ -43,7 +43,8 @@ private:
     using VectorOfConsumerInfo = std::vector<ConsumerInfoUPtr>;
 
     void readFileLines(FileReader& freader) override;
-    void filterLines(size_t idx, WildcardMatch& wcmatch, std::string pattern) override;
+    void filterLines(size_t idx, WildcardMatch& wcmatch,
+                                    const std::string& pattern) override;
 
     size_t calcFinalResult() const override;
     void init() override;

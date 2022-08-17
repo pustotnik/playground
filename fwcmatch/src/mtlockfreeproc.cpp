@@ -77,7 +77,7 @@ void MTLockFreeProcessor::readFileLines(FileReader& freader) {
 }
 
 void MTLockFreeProcessor::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, string pattern) {
+                            WildcardMatch& wcmatch, const string& pattern) {
 
     size_t counter = 0;
     LinesBlockPtr block = nullptr;

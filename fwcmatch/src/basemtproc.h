@@ -36,7 +36,8 @@ protected:
     LinesBlockPtr readInLinesBlock(FileReader& freader);
 
     // must be used in filterLines
-    size_t filterBlockAndFree(WildcardMatch& wcmatch, std::string pattern, LinesBlock& block);
+    size_t filterBlockAndFree(WildcardMatch& wcmatch, const std::string& pattern,
+                                                            LinesBlock& block);
 
 private:
     using VectorOfBlocks = std::vector<LinesBlock>;
@@ -50,7 +51,7 @@ private:
     virtual void readFileLines(FileReader& freader) = 0;
 
     // it is called in consumer threads
-    virtual void filterLines(size_t idx, WildcardMatch& wcmatch, std::string pattern) = 0;
+    virtual void filterLines(size_t idx, WildcardMatch& wcmatch, const std::string& pattern) = 0;
 
     // gather all counters from all consumers
     // it is called in the 'execute' method after all threads finished
@@ -69,7 +70,7 @@ private:
 };
 
 inline size_t BaseMTProcessor::filterBlockAndFree(WildcardMatch& wcmatch,
-                                        std::string pattern, LinesBlock& block) {
+                                        const std::string& pattern, LinesBlock& block) {
 
     auto& lines = block.lines;
     size_t counter = count_if(lines.cbegin(), lines.cend(),

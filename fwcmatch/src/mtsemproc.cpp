@@ -69,7 +69,7 @@ void MTSemProcessor::readFileLines(FileReader& freader) {
 }
 
 void MTSemProcessor::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, string pattern) {
+                            WildcardMatch& wcmatch, const string& pattern) {
 
     static auto termBlock = static_cast<LinesBlockPtr>(TERM_BLOCK);
     size_t counter = 0;
