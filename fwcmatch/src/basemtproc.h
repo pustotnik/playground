@@ -60,12 +60,12 @@ private:
     LinesBlockPtr allocBlock();
     void freeBlock(LinesBlockPtr p);
 
-    size_t                  _numOfThreads;
-    size_t                  _maxLines;
+    const size_t            _numOfThreads;
+    const size_t            _maxLines;
     VectorOfBlocks          _blocksHolder;
     BlockPtrsRing           _freeBlocks;
     Threads                 _threads;
-    std::mutex              _blockMutex;
+    mutable std::mutex      _blockMutex;
 };
 
 inline size_t BaseMTProcessor::filterBlockAndFree(WildcardMatch& wcmatch,

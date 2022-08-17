@@ -20,7 +20,7 @@ public:
 
 private:
 
-    size_t               _maxLines;
+    const size_t         _maxLines;
     std::vector<char>    _buffer;
     mutable FileLineRefs _flines;
 };
