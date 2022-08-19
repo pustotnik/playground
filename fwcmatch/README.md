@@ -280,7 +280,7 @@ On different OS/hardware/implementation the results can be different.
 - Lock free solution is not the best choice for a common case.
 - MTSem (semaphores) is very similar to the MTCondVar (condition variables)
   in terms of performance but the MTCondVar is better.
-- BM_MTCondVar2 is a little bit faster than BM_MTCondVar but there no big difference.
+- MTCondVar2 is a little bit faster than MTCondVar but there no big difference.
 
 ## About mmap
 The **mmap** in these benchmarks are fastest but you should to know that it was warm run and the
