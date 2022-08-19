@@ -5,8 +5,8 @@
 #include <iostream>
 #include <string>
 
+#include "utils.h"
 #include "fstreamreader.h"
-#include "common.h"
 
 FStreamReader::~FStreamReader() {
     close();

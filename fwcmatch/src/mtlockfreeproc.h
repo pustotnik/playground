@@ -47,8 +47,18 @@ private:
                                     const std::string& pattern) override;
 
     size_t calcFinalResult() const override;
-    void init() override;
+    void init(const bool needsBuffer) override;
 
+    LinesBlockPool       _blocksPool;
     VectorOfConsumerInfo _consThreadInfo;
+    std::mutex           _blocksMutex;
     std::atomic<bool>    _stop { false };
 };
+
+inline size_t MTLockFreeProcessor::calcFinalResult() const {
+    size_t result = 0;
+    for(auto const& consInfo: _consThreadInfo) {
+        result += consInfo->counter;
+    }
+    return result;
+}

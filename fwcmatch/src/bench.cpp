@@ -16,7 +16,6 @@
 #include "mtcondvarproc.h"
 #include "mtlockfreeproc.h"
 #include "mtsemproc.h"
-#include "common.h"
 
 using namespace std;
 
@@ -42,7 +41,7 @@ void BM_Sequential(benchmark::State& state) {
 }
 
 static void genSequentialArguments(benchmark::internal::Benchmark* b) {
-    b->Arg(1)->Arg(2)->Arg(4)->Arg(20)->Arg(40)
+    b->Arg(1)->Arg(4)->Arg(20)->Arg(40)
     ->ArgNames({"mlines", })
     //->Iterations(2)
     ->Unit(benchmark::kMillisecond)

@@ -1,40 +1,42 @@
 
 #include <cassert>
 #include <algorithm>
-#include <numeric>
 
 #include "mtcondvarproc.h"
+#include "utils.h"
 
 using namespace std;
 
 MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
-BaseMTProcessor(numOfConsThreads, maxLines,
+    BaseMTProcessor(numOfConsThreads, maxLines),
     // for each block in queue and for each thread for waiting
-    queueSize + numOfConsThreads + 1),
-_blocksQueue(queueSize), _counters(numOfConsThreads, 0)  {
+    _blocksPool(queueSize + numOfConsThreads + 1, maxLines),
+    _blocksQueue(queueSize),
+    _counters(numOfConsThreads, 0)  {
 
     assert(queueSize > 0);
 }
 
-void MTCondVarProcessor::init() {
+void MTCondVarProcessor::init(const bool needsBuffer) {
 
     _stop = false;
     _blocksQueue.clear();
+    _blocksPool.reset(needsBuffer);
 
     // std::fill works too slowly :(
     _counters.assign(_counters.size(), 0);
 }
 
-size_t MTCondVarProcessor::calcFinalResult() const {
-    return std::accumulate(_counters.begin(), _counters.end(),
-                                decltype(_counters)::value_type(0));
-}
-
 void MTCondVarProcessor::readFileLines(FileReader& freader) {
+
+    LinesBlockPtr block = nullptr;
 
     for(;;) {
 
-        auto block = readInLinesBlock(freader);
+        block = allocBlock(_blocksPool, _blocksMutex);
+        assert(block);
+
+        readInLinesBlock(freader, *block);
         if(block->lines.empty()) {
             // end of file
             break;
@@ -77,7 +79,8 @@ void MTCondVarProcessor::filterLines(size_t idx,
         lock.unlock();
 
         assert(block);
-        counter += filterBlockAndFree(wcmatch, pattern, *block);
+        counter += filterBlock(wcmatch, pattern, *block);
+        freeBlock(_blocksPool, _blocksMutex, block);
     }
 
     _counters[idx] = counter;

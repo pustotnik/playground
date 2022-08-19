@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <numeric>
 #include <string>
 #include <vector>
 #include <memory>
@@ -30,11 +31,18 @@ private:
                                         const std::string& pattern) override;
 
     size_t calcFinalResult() const override;
-    void init() override;
+    void init(const bool needsBuffer) override;
 
+    LinesBlockPool             _blocksPool;
     BlockPtrsRing              _blocksQueue;
     std::vector<size_t>        _counters;
     std::mutex                 _queueMutex;
+    std::mutex                 _blocksMutex;
     std::unique_ptr<Semaphore> _semEmpty;
     std::unique_ptr<Semaphore> _semFull;
 };
+
+inline size_t MTSemProcessor::calcFinalResult() const {
+    return std::accumulate(_counters.begin(), _counters.end(),
+                                decltype(_counters)::value_type(0));
+}

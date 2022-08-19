@@ -4,8 +4,8 @@
 #include <cstring>
 #include <iostream>
 
+#include "utils.h"
 #include "fgetsreader.h"
-#include "common.h"
 
 FGetsReader::~FGetsReader() {
     close();

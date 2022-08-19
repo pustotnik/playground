@@ -7,7 +7,7 @@
 #include <mutex>
 
 #include "noncopyable.h"
-#include "common.h"
+#include "linesblock.h"
 #include "ringbuffer.h"
 #include "wildcard.h"
 #include "filereader.h"
@@ -16,7 +16,7 @@ class BaseMTProcessor: private noncopyable
 {
 public:
 
-    BaseMTProcessor(size_t numOfConsThreads, size_t maxLines, size_t numOfBlocks);
+    BaseMTProcessor(size_t numOfConsThreads, size_t maxLines);
     virtual ~BaseMTProcessor();
 
     size_t execute(FileReader& freader, const std::string& filename,
@@ -24,28 +24,30 @@ public:
 
 protected:
 
-    // simplified structure for effective storage of blocks of file lines
-    struct LinesBlock {
-        std::vector<char> buffer;
-        FileLineRefs      lines;
-    };
-
-    using LinesBlockPtr = LinesBlock*;
-
     // must be used in readFileLines
-    LinesBlockPtr readInLinesBlock(FileReader& freader);
+    void readInLinesBlock(FileReader& freader, LinesBlock& block);
 
     // must be used in filterLines
-    size_t filterBlockAndFree(WildcardMatch& wcmatch, const std::string& pattern,
+    size_t filterBlock(WildcardMatch& wcmatch, const std::string& pattern,
                                                             LinesBlock& block);
 
+    template<typename Mutex>
+    LinesBlockPtr allocBlock(LinesBlockPool& pool, Mutex& mutex) {
+        std::scoped_lock lock(mutex);
+        return pool.allocBlock();
+    }
+
+    template<typename Mutex>
+    void freeBlock(LinesBlockPool& pool, Mutex& mutex, LinesBlockPtr p) {
+        std::scoped_lock lock(mutex);
+        pool.freeBlock(p);
+    }
+
 private:
-    using VectorOfBlocks = std::vector<LinesBlock>;
-    using BlockPtrsRing  = SimpleRingBuffer<LinesBlockPtr>;
-    using Threads        = std::vector<std::thread>;
+    using Threads = std::vector<std::thread>;
 
     // it is called in the 'execute' method in the beginning (so threads haven't started yet)
-    virtual void init() = 0;
+    virtual void init(const bool needsBuffer) = 0;
 
     // it is called in producer thread
     virtual void readFileLines(FileReader& freader) = 0;
@@ -57,19 +59,31 @@ private:
     // it is called in the 'execute' method after all threads finished
     virtual size_t calcFinalResult() const = 0;
 
-    void doInit();
-    LinesBlockPtr allocBlock();
-    void freeBlock(LinesBlockPtr p);
-
-    const size_t            _numOfThreads;
-    const size_t            _maxLines;
-    VectorOfBlocks          _blocksHolder;
-    BlockPtrsRing           _freeBlocks;
-    Threads                 _threads;
-    mutable std::mutex      _blockMutex;
+    const size_t _maxLines;
+    Threads      _threads;
 };
 
-inline size_t BaseMTProcessor::filterBlockAndFree(WildcardMatch& wcmatch,
+inline void BaseMTProcessor::readInLinesBlock(FileReader& freader, LinesBlock& block) {
+
+    const bool needsBuffer = freader.needsBuffer();
+
+    auto& lines  = block.lines;
+    auto& buffer = block.buffer;
+
+    lines.clear();
+    for(size_t i = 0; i < _maxLines; ++i) {
+        if(needsBuffer) {
+            freader.setBuffer(buffer.get(i), buffer.blockSize());
+        }
+        auto line = freader.readLine();
+        if(!line.data()) {
+            break;
+        }
+        lines.push_back(std::move(line));
+    }
+}
+
+inline size_t BaseMTProcessor::filterBlock(WildcardMatch& wcmatch,
                                         const std::string& pattern, LinesBlock& block) {
 
     auto& lines = block.lines;
@@ -78,23 +92,6 @@ inline size_t BaseMTProcessor::filterBlockAndFree(WildcardMatch& wcmatch,
     );
 
     lines.clear();
-    freeBlock(&block);
 
     return counter;
-}
-
-inline BaseMTProcessor::LinesBlockPtr BaseMTProcessor::allocBlock() {
-    std::scoped_lock lock(_blockMutex);
-    if(_freeBlocks.empty()) {
-        return nullptr;
-    }
-
-    auto p = _freeBlocks.top();
-    _freeBlocks.pop();
-    return p;
-}
-
-inline void BaseMTProcessor::freeBlock(BaseMTProcessor::LinesBlockPtr p) {
-    std::scoped_lock lock(_blockMutex);
-    _freeBlocks.push(p);
 }

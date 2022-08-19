@@ -1,9 +1,5 @@
 
 #include <cassert>
-#include <algorithm>
-#include <memory>
-#include <numeric>
-#include <iostream>
 
 #include "mtsemproc.h"
 
@@ -13,15 +9,18 @@ using namespace std;
 static void* TERM_BLOCK = reinterpret_cast<void*>(-1);
 
 MTSemProcessor::MTSemProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
-BaseMTProcessor(numOfConsThreads, maxLines,
+    BaseMTProcessor(numOfConsThreads, maxLines),
     // for each block in queue and for each thread for waiting
-    queueSize + numOfConsThreads + 1),
-_blocksQueue(queueSize), _counters(numOfConsThreads, 0)  {
+    _blocksPool(queueSize + numOfConsThreads + 1, maxLines),
+    _blocksQueue(queueSize),
+    _counters(numOfConsThreads, 0)  {
 
     assert(queueSize > 0);
 }
 
-void MTSemProcessor::init() {
+void MTSemProcessor::init(const bool needsBuffer) {
+
+    _blocksPool.reset(needsBuffer);
 
     // I didn't find any other way to reset std::counting_semaphore objects
     _semEmpty = make_unique<Semaphore>(_blocksQueue.capacity());
@@ -33,11 +32,6 @@ void MTSemProcessor::init() {
     _counters.assign(_counters.size(), 0);
 }
 
-size_t MTSemProcessor::calcFinalResult() const {
-    return std::accumulate(_counters.begin(), _counters.end(),
-                                decltype(_counters)::value_type(0));
-}
-
 void MTSemProcessor::readFileLines(FileReader& freader) {
 
     static auto termBlock = static_cast<LinesBlockPtr>(TERM_BLOCK);
@@ -45,7 +39,9 @@ void MTSemProcessor::readFileLines(FileReader& freader) {
 
     for(;;) {
 
-        auto block = readInLinesBlock(freader);
+        auto block = allocBlock(_blocksPool, _blocksMutex);
+        assert(block);
+        readInLinesBlock(freader, *block);
         if(block->lines.empty()) {
             // end of file
 
@@ -102,7 +98,8 @@ void MTSemProcessor::filterLines(size_t idx,
         }
 
         assert(block);
-        counter += filterBlockAndFree(wcmatch, pattern, *block);
+        counter += filterBlock(wcmatch, pattern, *block);
+        freeBlock(_blocksPool, _blocksMutex, block);
     }
 
     _counters[idx] = counter;

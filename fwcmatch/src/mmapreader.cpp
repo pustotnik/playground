@@ -8,8 +8,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include "utils.h"
 #include "mmapreader.h"
-#include "common.h"
 
 MMapReader::~MMapReader() {
     close();

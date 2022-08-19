@@ -23,10 +23,10 @@ And I implemented this as a single-threaded and as a multi-threaded solutions.
 Also I wanted to play with such paramenters as number of read/filtered
 lines at one time and number of threads.
 
-NOTE: I wrote this code avoiding any memory reallocation during reading and
-filtering. For example for queue in multi-threaded implementation a simple
-fixed size ring/circular buffer is used.
-And all memory buffers are allocated beforehand.
+*NOTE*: I wrote this code **avoiding any memory (re)allocation on heap during reading and
+filtering**. All needed memory is allocated beforehand. For example for queue to
+communicate between producer and consumers in multi-threaded implementation
+a fixed size ring/circular buffer is used.
 
 This code is for Linix OS only. Maybe it can work on MacOS but I haven't tried.
 
@@ -46,7 +46,7 @@ But CMakeLists.txt for cmake build system is also provided.
 - Data storage: NVMe SSD
 - OS: Gentoo Linux (kernel 5.10.27)
 - Filesystem: ext4
-- C++ compiler: g++ 11.2.1 (-std=c++20 -O3 -fno-rtti -flto)
+- C++ compiler: g++ 11.2.1 (-std=c++20 -O3 -fno-rtti)
 - CPU Frequency Scaling is turned off:
   ```
   sudo cpupower frequency-set --governor performance

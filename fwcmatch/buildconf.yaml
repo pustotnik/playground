@@ -10,9 +10,11 @@ tasks:
 configure:
   - do: check-libs
 
-#CMN_CXXFLAGS: -Wall -Wextra -std=c++17 -fno-rtti -flto
-CMN_CXXFLAGS: -Wall -Wextra -std=c++20 -fno-rtti -flto
-CMN_LINK_FLAGS: -flto
+# Results with -flto with g++ (11.2.1) aren't stable. Some tests get bet
+# better performance while some others don't get it and this draws a strange picture.
+# So I decided to turn off -flto for this project.
+CMN_CXXFLAGS: -Wall -Wextra -std=c++20 -fno-rtti #-flto
+CMN_LINK_FLAGS: "" #-flto
 
 SANIT_CMN_CXXFLAGS: $CMN_CXXFLAGS -fsanitize=address
 SANIT_CMN_LINK_FLAGS: $CMN_LINK_FLAGS -fsanitize=address
@@ -26,10 +28,10 @@ buildtypes:
     #cxxflags: $CMN_CXXFLAGS -O2
     cxxflags: $CMN_CXXFLAGS -O3
     linkflags: $CMN_LINK_FLAGS
-    #defines: NDEBUG=1
+    defines: NDEBUG=1 # turn off asserts
 
   debug:
-    cxxflags: $CMN_GCC_FLAGS -O0 -g
+    cxxflags: $CMN_CXXFLAGS -O0 -g
     linkflags: $CMN_LINK_FLAGS
 
   sanit-rls:

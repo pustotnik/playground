@@ -7,9 +7,9 @@
 using namespace std;
 
 MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
-BaseMTProcessor(numOfConsThreads, maxLines,
+    BaseMTProcessor(numOfConsThreads, maxLines),
     // for each block in queue and for each thread for waiting
-    (queueSize + 1) * (numOfConsThreads + 1)) {
+    _blocksPool((queueSize + 1) * (numOfConsThreads + 1), maxLines) {
 
     assert(queueSize > 0);
 
@@ -19,21 +19,15 @@ BaseMTProcessor(numOfConsThreads, maxLines,
     }
 }
 
-void MTLockFreeProcessor::init() {
+void MTLockFreeProcessor::init(const bool needsBuffer) {
 
     _stop.store(false, memory_order_release);
+
+    _blocksPool.reset(needsBuffer);
 
     for(auto& consInfo: _consThreadInfo) {
         consInfo->clear();
     }
-}
-
-size_t MTLockFreeProcessor::calcFinalResult() const {
-    size_t result = 0;
-    for(auto const& consInfo: _consThreadInfo) {
-        result += consInfo->counter;
-    }
-    return result;
 }
 
 void MTLockFreeProcessor::readFileLines(FileReader& freader) {
@@ -48,7 +42,9 @@ void MTLockFreeProcessor::readFileLines(FileReader& freader) {
     for(;;) {
 
         if(!block) {
-            block = readInLinesBlock(freader);
+            block = allocBlock(_blocksPool, _blocksMutex);
+            assert(block);
+            readInLinesBlock(freader, *block);
             if(block->lines.empty()) {
                 // end of file
                 break;
@@ -101,7 +97,8 @@ void MTLockFreeProcessor::filterLines(size_t idx,
         }
 
         assert(block);
-        counter += filterBlockAndFree(wcmatch, pattern, *block);
+        counter += filterBlock(wcmatch, pattern, *block);
+        freeBlock(_blocksPool, _blocksMutex, block);
     }
 
     consInfo.counter = counter;

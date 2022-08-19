@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstddef>
+#include <numeric>
 #include <string>
 #include <vector>
 #include <mutex>
@@ -28,12 +29,19 @@ private:
                                         const std::string& pattern) override;
 
     size_t calcFinalResult() const override;
-    void init() override;
+    void init(const bool needsBuffer) override;
 
+    LinesBlockPool          _blocksPool;
     BlockPtrsRing           _blocksQueue;
     std::vector<size_t>     _counters;
     std::mutex              _queueMutex;
+    std::mutex              _blocksMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
     bool                    _stop { false };
 };
+
+inline size_t MTCondVarProcessor::calcFinalResult() const {
+    return std::accumulate(_counters.begin(), _counters.end(),
+                                decltype(_counters)::value_type(0));
+}

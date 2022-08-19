@@ -4,7 +4,7 @@
 #include <string>
 
 #include "noncopyable.h"
-#include "common.h"
+#include "linesblock.h"
 
 class FileReader: private noncopyable
 {
