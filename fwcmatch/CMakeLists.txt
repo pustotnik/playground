@@ -57,6 +57,7 @@ set(SRC_LIST
     src/fstreamreader.cpp
     src/mmapreader.cpp
     src/mtcondvarproc.cpp
+    src/mtcondvar2proc.cpp
     src/mtlockfreeproc.cpp
     src/mtsemproc.cpp
     src/mywildcard.cpp

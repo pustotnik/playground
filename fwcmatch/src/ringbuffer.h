@@ -37,6 +37,16 @@ public:
         ++_size;
     }
 
+    // push with swapping instead of copying
+    void pushSwapping(Value& v) {
+        // this implementaion does not allow to replace existing item
+        assert(!full());
+
+        std::swap(_buffer[_tail], v);
+        increment(_tail);
+        ++_size;
+    }
+
     void pop() {
         // this implementaion does not allow to pop not existing item
         assert(!empty());
@@ -47,6 +57,13 @@ public:
 
     [[nodiscard]] Value& top() { assert(!empty()); return _buffer[_head]; }
     [[nodiscard]] Value const& top() const { assert(!empty()); return _buffer[_head]; }
+
+    template<typename Callable>
+    void apply(Callable&& func) {
+        for(auto& v: _buffer) {
+            func(v);
+        }
+    }
 
 private:
     std::vector<T> _buffer;
