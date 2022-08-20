@@ -14,7 +14,6 @@
 #include "regexwildcard.h"
 #include "seqproc.h"
 #include "mtcondvarproc.h"
-#include "mtcondvar2proc.h"
 #include "mtlockfreeproc.h"
 #include "mtsemproc.h"
 
@@ -112,11 +111,6 @@ void BM_MTCondVar(benchmark::State& state) {
 }
 
 template<typename FReader, typename WildcardMatch>
-void BM_MTCondVar2(benchmark::State& state) {
-    MTProdConsTempl<MTCondVar2Processor, FReader, WildcardMatch>(state);
-}
-
-template<typename FReader, typename WildcardMatch>
 void BM_MTLockFree(benchmark::State& state) {
     MTProdConsTempl<MTLockFreeProcessor, FReader, WildcardMatch>(state);
 }
@@ -154,15 +148,6 @@ BENCHMARK(BM_MTCondVar<FStreamReader, MyWildcardMatch>)
     ->Apply(genMultithreadingArguments);
 
 BENCHMARK(BM_MTCondVar<MMapReader, MyWildcardMatch>)
-    ->Apply(genMultithreadingArguments);
-
-BENCHMARK(BM_MTCondVar2<FGetsReader, MyWildcardMatch>)
-    ->Apply(genMultithreadingArguments);
-
-BENCHMARK(BM_MTCondVar2<FStreamReader, MyWildcardMatch>)
-    ->Apply(genMultithreadingArguments);
-
-BENCHMARK(BM_MTCondVar2<MMapReader, MyWildcardMatch>)
     ->Apply(genMultithreadingArguments);
 
 BENCHMARK(BM_MTLockFree<FGetsReader, MyWildcardMatch>)

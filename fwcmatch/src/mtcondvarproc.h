@@ -22,7 +22,7 @@ public:
 
 private:
 
-    using BlockPtrsRing = SimpleRingBuffer<LinesBlockPtr>;
+    using BlockPtrsRing = SimpleRingBuffer<LinesBlock>;
 
     void readFileLines(FileReader& freader) override;
     void filterLines(size_t idx, WildcardMatch& wcmatch,
@@ -31,14 +31,22 @@ private:
     size_t calcFinalResult() const override;
     void init(const bool needsBuffer) override;
 
-    LinesBlockPool          _blocksPool;
+    void initLinesBlock(LinesBlock& block) {
+        block.lines.reserve(_maxLines);
+        if(_needsBuffer) {
+            block.buffer.resize(_maxLines, BlocksBuffer::DEFAULT_BLOCK_SIZE);
+        }
+    }
+
     BlockPtrsRing           _blocksQueue;
     std::vector<size_t>     _counters;
     std::mutex              _queueMutex;
     std::mutex              _blocksMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
-    bool                    _stop { false };
+    const size_t            _maxLines;
+    bool                    _stop        { false };
+    bool                    _needsBuffer { true };
 };
 
 inline size_t MTCondVarProcessor::calcFinalResult() const {
