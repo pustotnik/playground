@@ -25,7 +25,7 @@ public:
     [[nodiscard]] bool full() const noexcept { return size() == capacity(); }
 
     // reset to initial state
-    // this methd does'n touch values in the internal buffer
+    // this method does not touch values in the internal buffer
     void reset() noexcept {
         _head = _tail = _size = 0;
     }
