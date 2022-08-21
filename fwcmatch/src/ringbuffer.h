@@ -16,9 +16,6 @@ public:
     explicit SimpleRingBuffer(size_t capacity): _buffer(capacity) {
     }
 
-    ~SimpleRingBuffer() {
-    }
-
     [[nodiscard]] size_t size() const noexcept { return _size; }
     [[nodiscard]] size_t capacity() const noexcept { return _buffer.size(); }
     [[nodiscard]] bool empty() const noexcept { return 0 == size(); }

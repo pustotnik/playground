@@ -2,6 +2,7 @@
 
 #include <cstddef>
 #include <memory>
+#include <mutex>
 #include <atomic>
 
 #include "wfringbuffer.h"
@@ -33,8 +34,8 @@ private:
         explicit ConsumerInfo(size_t queueSize): blocksQueue(queueSize) {}
 
         // not thread safe
-        void clear() {
-            blocksQueue.clear();
+        void reset() {
+            blocksQueue.reset();
             counter = 0;
         }
     };
@@ -49,6 +50,9 @@ private:
     size_t calcFinalResult() const override;
     void init(const bool needsBuffer) override;
 
+    LinesBlockPtr allocBlock();
+    void freeBlock(LinesBlockPtr p);
+
     LinesBlockPool       _blocksPool;
     VectorOfConsumerInfo _consThreadInfo;
     std::mutex           _blocksMutex;
@@ -61,4 +65,14 @@ inline size_t MTLockFreeProcessor::calcFinalResult() const {
         result += consInfo->counter;
     }
     return result;
+}
+
+inline LinesBlockPtr MTLockFreeProcessor::allocBlock() {
+    std::scoped_lock lock(_blocksMutex);
+    return _blocksPool.allocBlock();
+}
+
+inline void MTLockFreeProcessor::freeBlock(LinesBlockPtr p) {
+    std::scoped_lock lock(_blocksMutex);
+    _blocksPool.freeBlock(p);
 }

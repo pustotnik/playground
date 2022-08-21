@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <thread>
-#include <mutex>
 
 #include "noncopyable.h"
 #include "linesblock.h"
@@ -30,18 +29,6 @@ protected:
     // must be used in filterLines
     size_t filterBlock(WildcardMatch& wcmatch, const std::string& pattern,
                                                             LinesBlock& block);
-
-    template<typename Mutex>
-    LinesBlockPtr allocBlock(LinesBlockPool& pool, Mutex& mutex) {
-        std::scoped_lock lock(mutex);
-        return pool.allocBlock();
-    }
-
-    template<typename Mutex>
-    void freeBlock(LinesBlockPool& pool, Mutex& mutex, LinesBlockPtr p) {
-        std::scoped_lock lock(mutex);
-        pool.freeBlock(p);
-    }
 
 private:
     using Threads = std::vector<std::thread>;

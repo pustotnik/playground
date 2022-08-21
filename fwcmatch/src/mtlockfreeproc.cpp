@@ -26,7 +26,7 @@ void MTLockFreeProcessor::init(const bool needsBuffer) {
     _blocksPool.reset(needsBuffer);
 
     for(auto& consInfo: _consThreadInfo) {
-        consInfo->clear();
+        consInfo->reset();
     }
 }
 
@@ -42,7 +42,7 @@ void MTLockFreeProcessor::readFileLines(FileReader& freader) {
     for(;;) {
 
         if(!block) {
-            block = allocBlock(_blocksPool, _blocksMutex);
+            block = allocBlock();
             assert(block);
             readInLinesBlock(freader, *block);
             if(block->lines.empty()) {
@@ -98,7 +98,7 @@ void MTLockFreeProcessor::filterLines(size_t idx,
 
         assert(block);
         counter += filterBlock(wcmatch, pattern, *block);
-        freeBlock(_blocksPool, _blocksMutex, block);
+        freeBlock(block);
     }
 
     consInfo.counter = counter;

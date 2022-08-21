@@ -18,10 +18,11 @@ public:
     using Value = T;
 
     explicit WFSimpleRingBuffer(size_t capacity):
-    _buffer(capacity + 1), _capacity(capacity + 1) {
-    }
+        _bufferHolder(capacity + 1),
+        _buffer(_bufferHolder.data()),
+        _capacity(capacity + 1) {
 
-    ~WFSimpleRingBuffer() {
+        assert(capacity > 0);
     }
 
     bool push(const Value& v) {
@@ -47,18 +48,27 @@ public:
         return false; // empty
     }
 
-    [[nodiscard]] size_t capacity() const noexcept { return _buffer.size(); }
+    [[nodiscard]] size_t capacity() const noexcept { return _capacity - 1; }
 
+    // reset to initial state
+    // this method does not touch values in the internal buffer
     // not thread safe
-    void clear() noexcept {
+    void reset() noexcept {
         _head = 0;
         _tail = 0;
     }
 
 private:
-    std::vector<T>      _buffer;
-    std::atomic<size_t> _head {0};
-    std::atomic<size_t> _tail {0};
+    // I decided not to use vector directly and use additional pointer to data
+    // inside that vector to avoid any hidden operations in std::vector
+    // because it is more safe in terms of thread safity in this implementation.
+    // C++ standard does not guarantee that implemenation of std::vector::operator[]
+    // touches only internal memory buffer.
+    // So vector here is only for storage with automatic deallocation.
+    std::vector<T>      _bufferHolder;
+    T*                  _buffer  { nullptr };
+    std::atomic<size_t> _head    { 0 };
+    std::atomic<size_t> _tail    { 0 };
     const size_t        _capacity;
 
     size_t increment(size_t idx) const noexcept {
