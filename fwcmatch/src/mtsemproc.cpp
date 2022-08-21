@@ -79,7 +79,7 @@ void MTSemProcessor::filterLines(size_t idx,
                             WildcardMatch& wcmatch, const string& pattern) {
 
     size_t counter = 0;
-    LinesBlockPtr block = _firstBlocks[idx  +1];
+    LinesBlockPtr block = _firstBlocks[idx + 1];
     bool last = false;
 
     for(;;) {

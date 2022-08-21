@@ -11,9 +11,12 @@
 /*
 This class implements strategy of solving the problem as a group of
 pairs <single producer - single consumer> with wait-free ring buffer.
-THis solution don't use mutexes and condition variables for communication
+This solution don't use mutexes and condition variables for communication
 between producer and consumers but it works in busy-waiting mode when
 these ring buffers are full or empty.
+
+This is not the best and fastest solution of such type but it can show the main
+disadvantage of this method.
 
 There is no memory reallocation during processing.
 */
