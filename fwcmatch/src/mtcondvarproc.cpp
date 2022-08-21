@@ -21,7 +21,7 @@ void MTCondVarProcessor::init(const bool needsBuffer) {
     _stop = false;
     _needsBuffer = needsBuffer;
 
-    _blocksQueue.clear();
+    _blocksQueue.reset();
     _blocksQueue.apply([&](LinesBlock& block) { initLinesBlock(block); } );
 
     // std::fill works too slowly :(

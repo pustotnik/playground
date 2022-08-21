@@ -24,7 +24,9 @@ public:
     [[nodiscard]] bool empty() const noexcept { return 0 == size(); }
     [[nodiscard]] bool full() const noexcept { return size() == capacity(); }
 
-    void clear() noexcept {
+    // reset to initial state
+    // this methd does'n touch values in the internal buffer
+    void reset() noexcept {
         _head = _tail = _size = 0;
     }
 
@@ -58,6 +60,7 @@ public:
     [[nodiscard]] Value& top() { assert(!empty()); return _buffer[_head]; }
     [[nodiscard]] Value const& top() const { assert(!empty()); return _buffer[_head]; }
 
+    // Apply function to all values in the internal buffer
     template<typename Callable>
     void apply(Callable&& func) {
         for(auto& v: _buffer) {

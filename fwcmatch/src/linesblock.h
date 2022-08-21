@@ -168,7 +168,7 @@ public:
     void reset(const bool allocBuffers) {
 
         // reset all pointers of free blocks
-        _freeBlocks.clear();
+        _freeBlocks.reset();
         for(auto& block: _blocks) {
             _freeBlocks.push(&block);
             if(allocBuffers) {

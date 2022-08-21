@@ -35,11 +35,12 @@ private:
 
     LinesBlockPool             _blocksPool;
     BlockPtrsRing              _blocksQueue;
+    std::vector<LinesBlockPtr> _firstBlocks;
     std::vector<size_t>        _counters;
     std::mutex                 _queueMutex;
-    std::mutex                 _blocksMutex;
     std::unique_ptr<Semaphore> _semEmpty;
     std::unique_ptr<Semaphore> _semFull;
+    const size_t               _numOfThreads;
 };
 
 inline size_t MTSemProcessor::calcFinalResult() const {
