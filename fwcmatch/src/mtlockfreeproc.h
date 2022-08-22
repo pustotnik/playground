@@ -16,7 +16,10 @@ between producer and consumers but it works in busy-waiting mode when
 these ring buffers are full or empty.
 
 This is not the best and fastest solution of such type but it can show the main
-disadvantage of this method.
+disadvantage of this method. The mutex is used here only for access to block
+from pool of blocks. Also I implemented solution without such a mutex but with
+additional wait free ring buffer to store free blocks to use but this didn't make
+performance better. Actually this made performance a little bit worse.
 
 There is no memory reallocation during processing.
 */
