@@ -22,7 +22,7 @@ public:
 
 private:
 
-    using BlockPtrsRing = SimpleRingBuffer<LinesBlock>;
+    using BlocksRing = SimpleRingBuffer<LinesBlock>;
 
     void readFileLines(FileReader& freader) override;
     void filterLines(size_t idx, WildcardMatch& wcmatch,
@@ -38,10 +38,9 @@ private:
         }
     }
 
-    BlockPtrsRing           _blocksQueue;
+    BlocksRing              _blocksQueue;
     std::vector<size_t>     _counters;
     std::mutex              _queueMutex;
-    std::mutex              _blocksMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
     const size_t            _maxLines;

@@ -3,3 +3,4 @@
 -Wall
 -Wextra
 -xc++
+-Wno-unused-const-variable
