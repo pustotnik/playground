@@ -6,10 +6,12 @@
 
 using namespace std;
 
-MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
+MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads,
+                                        size_t maxLines, bool needsBuffer):
     BaseMTProcessor(numOfConsThreads, maxLines),
     // for each block in queue and for each thread for waiting
-    _blocksPool((queueSize + 1) * (numOfConsThreads + 1), maxLines) {
+    _blocksPool((queueSize + 1) * (numOfConsThreads + 1), maxLines),
+    _needsBuffer(needsBuffer) {
 
     assert(queueSize > 0);
 
@@ -17,13 +19,15 @@ MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThrea
     for(size_t i = 0; i < numOfConsThreads; ++i) {
         _consThreadInfo.push_back(make_unique<ConsumerInfo>(queueSize));
     }
+
+    _blocksPool.reset(_needsBuffer);
 }
 
-void MTLockFreeProcessor::init(const bool needsBuffer) {
+void MTLockFreeProcessor::init() {
 
     _stop.store(false, memory_order_release);
 
-    _blocksPool.reset(needsBuffer);
+    _blocksPool.reset(false); // there is no need to allocate buffer here
 
     for(auto& consInfo: _consThreadInfo) {
         consInfo->reset();

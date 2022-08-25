@@ -19,7 +19,8 @@ it uses ring buffer for the queue of data between producer and consumers.
 class MTSemProcessor final: public BaseMTProcessor
 {
 public:
-    MTSemProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines);
+    MTSemProcessor(size_t queueSize, size_t numOfConsThreads,
+                                        size_t maxLines, bool needsBuffer);
 
 private:
 
@@ -31,7 +32,7 @@ private:
                                         const std::string& pattern) override;
 
     size_t calcFinalResult() const override;
-    void init(const bool needsBuffer) override;
+    void init() override;
 
     LinesBlockPool             _blocksPool;
     BlockPtrsRing              _blocksQueue;
@@ -41,6 +42,7 @@ private:
     std::unique_ptr<Semaphore> _semEmpty;
     std::unique_ptr<Semaphore> _semFull;
     const size_t               _numOfThreads;
+    const bool                 _needsBuffer;
 };
 
 inline size_t MTSemProcessor::calcFinalResult() const {

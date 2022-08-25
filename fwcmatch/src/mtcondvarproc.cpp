@@ -7,22 +7,32 @@
 
 using namespace std;
 
-MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
+MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads,
+                                        size_t maxLines, bool needsBuffer):
     BaseMTProcessor(numOfConsThreads, maxLines),
     _blocksQueue(queueSize),
     _counters(numOfConsThreads, 0),
-    _maxLines(maxLines)  {
+    _maxLines(maxLines),
+    _needsBuffer(needsBuffer) {
 
     assert(queueSize > 0);
+
+    _blocksQueue.apply([&](LinesBlock& block) { initLinesBlock(block); } );
+
+    auto numOfThreads = numOfConsThreads + 1;
+    _firstBlocks.reserve(numOfThreads);
+    for(size_t i = 0; i < numOfThreads; ++i) {
+        LinesBlock block;
+        initLinesBlock(block);
+        _firstBlocks.push_back(std::move(block));
+    }
 }
 
-void MTCondVarProcessor::init(const bool needsBuffer) {
+void MTCondVarProcessor::init() {
 
     _stop = false;
-    _needsBuffer = needsBuffer;
 
     _blocksQueue.reset();
-    _blocksQueue.apply([&](LinesBlock& block) { initLinesBlock(block); } );
 
     // std::fill works too slowly :(
     _counters.assign(_counters.size(), 0);
@@ -51,8 +61,7 @@ guarantee visibility of these changes in all threads:
 
 void MTCondVarProcessor::readFileLines(FileReader& freader) {
 
-    LinesBlock block;
-    initLinesBlock(block);
+    auto& block = _firstBlocks[0];
 
     for(;;) {
 
@@ -80,8 +89,7 @@ void MTCondVarProcessor::filterLines(size_t idx,
                             WildcardMatch& wcmatch, const string& pattern) {
 
     size_t counter = 0;
-    LinesBlock block;
-    initLinesBlock(block);
+    auto& block = _firstBlocks[idx + 1];
 
     for(;;) {
 

@@ -8,37 +8,41 @@ using namespace std;
 // special pointer to send as a terminal block
 static LinesBlockPtr TERM_BLOCK = reinterpret_cast<LinesBlockPtr>(-1);
 
-MTSemProcessor::MTSemProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines):
+MTSemProcessor::MTSemProcessor(size_t queueSize, size_t numOfConsThreads,
+                                            size_t maxLines, bool needsBuffer):
     BaseMTProcessor(numOfConsThreads, maxLines),
     // for each block in queue and for each thread for waiting
     _blocksPool(queueSize + numOfConsThreads + 1, maxLines),
     _blocksQueue(queueSize),
     _counters(numOfConsThreads, 0),
-    _numOfThreads(numOfConsThreads + 1)  {
+    _numOfThreads(numOfConsThreads + 1),
+    _needsBuffer(needsBuffer) {
 
     assert(queueSize > 0);
-}
 
-void MTSemProcessor::init(const bool needsBuffer) {
+    _blocksPool.reset(_needsBuffer);
 
-    _blocksPool.reset(needsBuffer);
-
-    // I didn't find any other way to reset std::counting_semaphore objects
-    _semEmpty = make_unique<Semaphore>(_blocksQueue.capacity());
-    _semFull  = make_unique<Semaphore>(0);
-
-    _firstBlocks.clear();
+    _firstBlocks.reserve(_numOfThreads);
     for(size_t i = 0; i < _numOfThreads; ++i) {
         _firstBlocks.push_back(_blocksPool.allocBlock());
     }
 
     // fill ring buffer with valid pointers
-    _blocksQueue.reset();
     for(size_t i = 0; i < _blocksQueue.capacity(); ++i) {
         _blocksQueue.push(_blocksPool.allocBlock());
     }
     // ring buffer must be empty
     _blocksQueue.reset();
+}
+
+void MTSemProcessor::init() {
+
+    _blocksPool.reset(false); // there is no need to allocate buffer here
+    _blocksQueue.reset();
+
+    // I didn't find any other way to reset std::counting_semaphore objects
+    _semEmpty = make_unique<Semaphore>(_blocksQueue.capacity());
+    _semFull  = make_unique<Semaphore>(0);
 
     // std::fill works too slowly :(
     _counters.assign(_counters.size(), 0);

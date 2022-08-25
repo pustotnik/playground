@@ -18,7 +18,8 @@ it uses ring buffer for the queue of data between producer and consumers.
 class MTCondVarProcessor final: public BaseMTProcessor
 {
 public:
-    MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines);
+    MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads,
+                        size_t maxLines, bool needsBuffer);
 
 private:
 
@@ -29,7 +30,7 @@ private:
                                         const std::string& pattern) override;
 
     size_t calcFinalResult() const override;
-    void init(const bool needsBuffer) override;
+    void init() override;
 
     void initLinesBlock(LinesBlock& block) {
         block.lines.reserve(_maxLines);
@@ -39,13 +40,14 @@ private:
     }
 
     BlocksRing              _blocksQueue;
+    std::vector<LinesBlock> _firstBlocks;
     std::vector<size_t>     _counters;
     std::mutex              _queueMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
     const size_t            _maxLines;
+    const bool              _needsBuffer;
     bool                    _stop        { false };
-    bool                    _needsBuffer { true };
 };
 
 inline size_t MTCondVarProcessor::calcFinalResult() const {

@@ -21,7 +21,7 @@ BaseMTProcessor::~BaseMTProcessor() {
 size_t BaseMTProcessor::execute(FileReader& freader, const string& filename,
                                 WildcardMatch& wcmatch, const string& pattern) {
 
-    init(freader.needsBuffer());
+    init();
     ScopedFileOpener fopener(freader, filename);
 
     _threads[0] = thread(&BaseMTProcessor::readFileLines,

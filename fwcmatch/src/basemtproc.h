@@ -34,7 +34,7 @@ private:
     using Threads = std::vector<std::thread>;
 
     // it is called in the 'execute' method in the beginning (so threads haven't started yet)
-    virtual void init(const bool needsBuffer) = 0;
+    virtual void init() = 0;
 
     // it is called in producer thread
     virtual void readFileLines(FileReader& freader) = 0;

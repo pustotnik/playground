@@ -26,7 +26,8 @@ There is no memory reallocation during processing.
 class MTLockFreeProcessor final: public BaseMTProcessor
 {
 public:
-    MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads, size_t maxLines);
+    MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads,
+                                    size_t maxLines, bool needsBuffer);
 
 private:
 
@@ -54,7 +55,7 @@ private:
                                     const std::string& pattern) override;
 
     size_t calcFinalResult() const override;
-    void init(const bool needsBuffer) override;
+    void init() override;
 
     LinesBlockPtr allocBlock();
     void freeBlock(LinesBlockPtr p);
@@ -63,6 +64,7 @@ private:
     VectorOfConsumerInfo _consThreadInfo;
     std::mutex           _blocksMutex;
     std::atomic<bool>    _stop { false };
+    const bool           _needsBuffer;
 };
 
 inline size_t MTLockFreeProcessor::calcFinalResult() const {
