@@ -9,25 +9,26 @@ using namespace std;
 MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads,
                                         size_t maxLines, bool needsBuffer):
     BaseMTProcessor(numOfConsThreads, maxLines),
-    // for each block in queue and for each thread for waiting
-    _blocksPool((queueSize + 1) * (numOfConsThreads + 1), maxLines),
     _needsBuffer(needsBuffer) {
 
     assert(queueSize > 0);
 
     _consThreadInfo.reserve(numOfConsThreads);
     for(size_t i = 0; i < numOfConsThreads; ++i) {
-        _consThreadInfo.push_back(make_unique<ConsumerInfo>(queueSize));
+        auto cinfo = make_unique<ConsumerInfo>(queueSize);
+        cinfo->blocksQueue.apply([&](LinesBlock& block) {
+            block.lines.reserve(maxLines);
+            if(_needsBuffer) {
+                block.buffer.resize(maxLines, BlocksBuffer::DEFAULT_BLOCK_SIZE);
+            }
+        });
+        _consThreadInfo.push_back(std::move(cinfo));
     }
-
-    _blocksPool.reset(_needsBuffer);
 }
 
 void MTLockFreeProcessor::init() {
 
     _stop.store(false, memory_order_release);
-
-    _blocksPool.reset(false); // there is no need to allocate buffer here
 
     for(auto& consInfo: _consThreadInfo) {
         consInfo->reset();
@@ -37,27 +38,26 @@ void MTLockFreeProcessor::init() {
 void MTLockFreeProcessor::readFileLines(FileReader& freader) {
 
     const auto numOfConsThreads = _consThreadInfo.size();
-    const size_t maxFailedPushes = numOfConsThreads * 2;
+    const size_t maxFailedPushes = numOfConsThreads * 1000;
 
     size_t failedPushes = 0;
     size_t consumerIdx = 0;
-    LinesBlockPtr block = nullptr;
+
+    bool noData = false;
+    auto readBlock = [&](LinesBlock& block) {
+        readInLinesBlock(freader, block);
+        noData = block.lines.empty();
+    };
 
     for(;;) {
 
-        if(!block) {
-            block = allocBlock();
-            assert(block);
-            readInLinesBlock(freader, *block);
-            if(block->lines.empty()) {
+        auto& consInfo = *_consThreadInfo[consumerIdx];
+
+        if(consInfo.blocksQueue.push(readBlock)) {
+            if(noData) {
                 // end of file
                 break;
             }
-        }
-
-        auto& consInfo = *_consThreadInfo[consumerIdx];
-        if(consInfo.blocksQueue.push(block)) {
-            block = nullptr;
             failedPushes = 0;
             continue;
         }
@@ -79,30 +79,34 @@ void MTLockFreeProcessor::readFileLines(FileReader& freader) {
 void MTLockFreeProcessor::filterLines(size_t idx,
                             WildcardMatch& wcmatch, const string& pattern) {
 
-    size_t counter = 0;
-    LinesBlockPtr block = nullptr;
-
+    constexpr size_t maxSpins = 1000;
     auto& consInfo = *_consThreadInfo[idx];
+    size_t counter = 0;
+    size_t spinner = 0;
+
+    auto handleBlock = [&](LinesBlock const& block) {
+        counter += filterBlock(wcmatch, pattern, block);
+    };
 
     for(;;) {
 
-        if(!consInfo.blocksQueue.pop(block)) {
+        if(consInfo.blocksQueue.pop(handleBlock)) {
+            continue;
+        }
 
-            if(_stop.load(memory_order_acquire)) {
-                break;
-            }
+        if(_stop.load(memory_order_acquire)) {
+            break;
+        }
+
+        if(++spinner > maxSpins) {
 
             // usually it is useless function on a platform with more than one
             // CPU core but because of busy-waiting it helps to decrease CPU load
             this_thread::yield();
-
-            // spin
-            continue;
+            spinner = 0;
         }
 
-        assert(block);
-        counter += filterBlock(wcmatch, pattern, *block);
-        freeBlock(block);
+        // spin
     }
 
     consInfo.counter = counter;

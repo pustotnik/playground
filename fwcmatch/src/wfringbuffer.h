@@ -37,10 +37,36 @@ public:
         return false; // full
     }
 
+    template<typename Callable>
+    bool push(Callable&& writer) {
+        const auto tail = _tail.load(std::memory_order_relaxed);
+        const auto nextTail = increment(tail);
+        if(nextTail != _head.load(std::memory_order_acquire)) {
+            writer(_buffer[tail]);
+            _tail.store(nextTail, std::memory_order_release);
+            return true;
+        }
+
+        return false; // full
+    }
+
     bool pop(Value& v) {
         const auto head = _head.load(std::memory_order_relaxed);
         if(head != _tail.load(std::memory_order_acquire)) {
             v = _buffer[head];
+            _head.store(increment(head), std::memory_order_release);
+            return true;
+        }
+
+        return false; // empty
+    }
+
+    template<typename Callable>
+    bool pop(Callable&& reader) {
+        const auto head = _head.load(std::memory_order_relaxed);
+        if(head != _tail.load(std::memory_order_acquire)) {
+            auto const& v = _buffer[head];
+            reader(v);
             _head.store(increment(head), std::memory_order_release);
             return true;
         }
@@ -56,6 +82,15 @@ public:
     void reset() noexcept {
         _head = 0;
         _tail = 0;
+    }
+
+    // Apply function to all values in the internal buffer
+    // not thread safe
+    template<typename Callable>
+    void apply(Callable&& func) {
+        for(auto& v: _bufferHolder) {
+            func(v);
+        }
     }
 
 private:

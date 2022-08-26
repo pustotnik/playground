@@ -28,7 +28,7 @@ protected:
 
     // must be used in filterLines
     size_t filterBlock(WildcardMatch& wcmatch, const std::string& pattern,
-                                                            LinesBlock& block);
+                                                        LinesBlock const& block);
 
 private:
     using Threads = std::vector<std::thread>;
@@ -71,14 +71,12 @@ inline void BaseMTProcessor::readInLinesBlock(FileReader& freader, LinesBlock& b
 }
 
 inline size_t BaseMTProcessor::filterBlock(WildcardMatch& wcmatch,
-                                        const std::string& pattern, LinesBlock& block) {
+                                    const std::string& pattern, LinesBlock const& block) {
 
     auto& lines = block.lines;
     size_t counter = count_if(lines.cbegin(), lines.cend(),
         [&](auto const& line){ return wcmatch.isMatch(line, pattern); }
     );
-
-    lines.clear();
 
     return counter;
 }

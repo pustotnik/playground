@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <memory>
-#include <mutex>
 #include <atomic>
 
 #include "wfringbuffer.h"
@@ -16,10 +15,7 @@ between producer and consumers but it works in busy-waiting mode when
 these ring buffers are full or empty.
 
 This is not the best and fastest solution of such type but it can show the main
-disadvantage of this method. The mutex is used here only for access to block
-from pool of blocks. Also I implemented solution without such a mutex but with
-additional wait free ring buffer to store free blocks to use but this didn't make
-performance better. Actually this made performance a little bit worse.
+disadvantage of this method.
 
 There is no memory reallocation during processing.
 */
@@ -31,11 +27,11 @@ public:
 
 private:
 
-    using WFBlockPtrsRing = WFSimpleRingBuffer<LinesBlockPtr>; // wait free ring buffer
+    using WFBlockRing = WFSimpleRingBuffer<LinesBlock>; // wait free ring buffer
 
     // specific info for each consumer's thread
     struct ConsumerInfo final {
-        WFBlockPtrsRing blocksQueue;
+        WFBlockRing     blocksQueue;
         size_t          counter {0};
 
         explicit ConsumerInfo(size_t queueSize): blocksQueue(queueSize) {}
@@ -57,12 +53,7 @@ private:
     size_t calcFinalResult() const override;
     void init() override;
 
-    LinesBlockPtr allocBlock();
-    void freeBlock(LinesBlockPtr p);
-
-    LinesBlockPool       _blocksPool;
     VectorOfConsumerInfo _consThreadInfo;
-    std::mutex           _blocksMutex;
     std::atomic<bool>    _stop { false };
     const bool           _needsBuffer;
 };
@@ -73,14 +64,4 @@ inline size_t MTLockFreeProcessor::calcFinalResult() const {
         result += consInfo->counter;
     }
     return result;
-}
-
-inline LinesBlockPtr MTLockFreeProcessor::allocBlock() {
-    std::scoped_lock lock(_blocksMutex);
-    return _blocksPool.allocBlock();
-}
-
-inline void MTLockFreeProcessor::freeBlock(LinesBlockPtr p) {
-    std::scoped_lock lock(_blocksMutex);
-    _blocksPool.freeBlock(p);
 }
