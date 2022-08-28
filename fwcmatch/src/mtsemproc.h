@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cstddef>
-#include <numeric>
 #include <string>
 #include <vector>
 #include <memory>
@@ -31,21 +30,14 @@ private:
     void filterLines(size_t idx, WildcardMatch& wcmatch,
                                         const std::string& pattern) override;
 
-    size_t calcFinalResult() const override;
     void init() override;
 
     LinesBlockPool             _blocksPool;
     BlockPtrsRing              _blocksQueue;
     std::vector<LinesBlockPtr> _firstBlocks;
-    std::vector<size_t>        _counters;
     std::mutex                 _queueMutex;
     std::unique_ptr<Semaphore> _semEmpty;
     std::unique_ptr<Semaphore> _semFull;
     const size_t               _numOfThreads;
     const bool                 _needsBuffer;
 };
-
-inline size_t MTSemProcessor::calcFinalResult() const {
-    return std::accumulate(_counters.begin(), _counters.end(),
-                                decltype(_counters)::value_type(0));
-}

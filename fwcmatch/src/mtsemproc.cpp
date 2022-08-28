@@ -14,7 +14,6 @@ MTSemProcessor::MTSemProcessor(size_t queueSize, size_t numOfConsThreads,
     // for each block in queue and for each thread for waiting
     _blocksPool(queueSize + numOfConsThreads + 1, maxLines),
     _blocksQueue(queueSize),
-    _counters(numOfConsThreads, 0),
     _numOfThreads(numOfConsThreads + 1),
     _needsBuffer(needsBuffer) {
 
@@ -43,9 +42,6 @@ void MTSemProcessor::init() {
     // I didn't find any other way to reset std::counting_semaphore objects
     _semEmpty = make_unique<Semaphore>(_blocksQueue.capacity());
     _semFull  = make_unique<Semaphore>(0);
-
-    // std::fill works too slowly :(
-    _counters.assign(_counters.size(), 0);
 }
 
 void MTSemProcessor::readFileLines(FileReader& freader) {

@@ -11,7 +11,6 @@ MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads
                                         size_t maxLines, bool needsBuffer):
     BaseMTProcessor(numOfConsThreads, maxLines),
     _blocksQueue(queueSize),
-    _counters(numOfConsThreads, 0),
     _maxLines(maxLines),
     _needsBuffer(needsBuffer) {
 
@@ -31,11 +30,7 @@ MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads
 void MTCondVarProcessor::init() {
 
     _stop = false;
-
     _blocksQueue.reset();
-
-    // std::fill works too slowly :(
-    _counters.assign(_counters.size(), 0);
 }
 
 /*

@@ -7,6 +7,7 @@
 using namespace std;
 
 BaseMTProcessor::BaseMTProcessor(size_t numOfConsThreads, size_t maxLines):
+    _counters(numOfConsThreads, 0),
     _maxLines(maxLines) {
 
     assert(numOfConsThreads > 0);
@@ -20,6 +21,9 @@ BaseMTProcessor::~BaseMTProcessor() {
 
 size_t BaseMTProcessor::execute(FileReader& freader, const string& filename,
                                 WildcardMatch& wcmatch, const string& pattern) {
+
+    // std::fill works too slowly :(
+    _counters.assign(_counters.size(), 0);
 
     init();
     ScopedFileOpener fopener(freader, filename);

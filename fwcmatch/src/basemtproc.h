@@ -2,12 +2,12 @@
 
 #include <cstddef>
 #include <string>
+#include <numeric>
 #include <vector>
 #include <thread>
 
 #include "noncopyable.h"
 #include "linesblock.h"
-#include "ringbuffer.h"
 #include "wildcard.h"
 #include "filereader.h"
 
@@ -30,6 +30,8 @@ protected:
     size_t filterBlock(WildcardMatch& wcmatch, const std::string& pattern,
                                                         LinesBlock const& block);
 
+    std::vector<size_t> _counters;
+
 private:
     using Threads = std::vector<std::thread>;
 
@@ -44,7 +46,7 @@ private:
 
     // gather all counters from all consumers
     // it is called in the 'execute' method after all threads finished
-    virtual size_t calcFinalResult() const = 0;
+    virtual size_t calcFinalResult() const;
 
     const size_t _maxLines;
     Threads      _threads;
@@ -79,4 +81,10 @@ inline size_t BaseMTProcessor::filterBlock(WildcardMatch& wcmatch,
     );
 
     return counter;
+}
+
+inline size_t BaseMTProcessor::calcFinalResult() const {
+
+    return std::accumulate(_counters.begin(), _counters.end(),
+                                decltype(_counters)::value_type(0));
 }
