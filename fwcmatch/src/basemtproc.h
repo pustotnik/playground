@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <string>
 #include <numeric>
+#include <algorithm>
 #include <vector>
 #include <thread>
 

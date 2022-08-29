@@ -1,6 +1,5 @@
 
 #include <cassert>
-#include <algorithm>
 
 #include "mtcondvarproc.h"
 #include "utils.h"
