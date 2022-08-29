@@ -34,7 +34,7 @@ endif()
 
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 
-set(CMN_GCC_FLAGS -Wall -Wextra -std=c++20 -fno-rtti -flto)
+set(CMN_GCC_FLAGS -Wall -Wextra -std=c++20 -fno-rtti)
 
 set(CMN_GCC_RELEASE_OPTS  ${CMN_GCC_FLAGS} -O3)
 set(CMN_GCC_DEBUG_OPTS    ${CMN_GCC_FLAGS} -O0)
@@ -57,6 +57,7 @@ set(SRC_LIST
     src/fstreamreader.cpp
     src/mmapreader.cpp
     src/mtcondvarproc.cpp
+    src/mtcondvarproc2.cpp
     src/mtlockfreeproc.cpp
     src/mtsemproc.cpp
     src/mywildcard.cpp
