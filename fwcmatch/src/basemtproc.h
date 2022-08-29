@@ -58,16 +58,23 @@ inline void BaseMTProcessor::readInLinesBlock(FileReader& freader, LinesBlock& b
 
     auto& lines  = block.lines;
     auto& buffer = block.buffer;
+    auto* bufferPtr = needsBuffer ? buffer.get(0) : nullptr;
+    size_t lastLineSize = 0;
 
     lines.clear();
     for(size_t i = 0; i < _maxLines; ++i) {
         if(needsBuffer) {
-            freader.setBuffer(buffer.get(i), buffer.blockSize());
+            //freader.setBuffer(buffer.get(i), buffer.blockSize());
+
+            // this way makes memory locality much better and improve performance
+            bufferPtr += lastLineSize;
+            freader.setBuffer(bufferPtr, buffer.blockSize());
         }
         auto line = freader.readLine();
         if(!line.data()) {
             break;
         }
+        lastLineSize = line.size();
         lines.push_back(std::move(line));
     }
 }
