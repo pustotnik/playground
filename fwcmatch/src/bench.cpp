@@ -42,7 +42,7 @@ void BM_Sequential(benchmark::State& state) {
 }
 
 static void genSequentialArguments(benchmark::internal::Benchmark* b) {
-    b->Arg(1)->Arg(4)->Arg(20)->Arg(40)
+    b->Arg(1)->Arg(4)->Arg(16)->Arg(32)
     ->ArgNames({"mlines", })
     //->Iterations(2)
     ->Unit(benchmark::kMillisecond)
@@ -86,16 +86,16 @@ template<typename Processor, typename FReader, typename WildcardMatch>
 void MTProdConsTempl(benchmark::State& state) {
 
     const size_t queueSize     = state.range(0);
-    const size_t numOfhreads   = state.range(1);
+    const size_t numOfThreads  = state.range(1);
     const size_t maxLines      = state.range(2);
 
     assert(queueSize > 0);
-    assert(numOfhreads > 1);
+    assert(numOfThreads > 1);
     assert(maxLines > 0);
 
     auto freader   = FReader();
     auto wcmatch   = WildcardMatch();
-    auto processor = Processor(queueSize, numOfhreads - 1,
+    auto processor = Processor(queueSize, numOfThreads - 1,
                                     maxLines, freader.needsBuffer());
 
     size_t found = 0;
@@ -129,18 +129,27 @@ void BM_MTSem(benchmark::State& state) {
 
 static void genMultithreadingArguments(benchmark::internal::Benchmark* b) {
     b
-    ->Args({2, 2, 10})
-    ->Args({2, 2, 100})
-    ->Args({3, 3, 10})
-    ->Args({3, 3, 100})
-    ->Args({1, 4, 100})
-    ->Args({4, 4, 100})
-    ->Args({4, 4, 500})
-    ->Args({8, 4, 500})
-    ->Args({16, 4, 500})
-    ->Args({8, 8, 200})
-    ->Args({8, 8, 500})
-    //->Args({16, 8, 500})
+    // queueSize, numOfThreads, maxLines
+
+    ->Args({2,   2, 16})
+    ->Args({2,   2, 96})
+    ->Args({8,   2, 96})
+    ->Args({32,  2, 96})
+
+    ->Args({2,   4, 96})
+    ->Args({4,   4, 96})
+    ->Args({8,   4, 96})
+    ->Args({16,  4, 96})
+    ->Args({32,  4, 96})
+    ->Args({128, 4, 96})
+    ->Args({4,   4, 256})
+    ->Args({8,   4, 256})
+    ->Args({16,  4, 256})
+
+    ->Args({8,   8, 256})
+    ->Args({16,  8, 256})
+    //->Args({16,  8, 512})
+
     ->ArgNames({"qsize", "threads", "mlines" })
     //->Iterations(2)
     ->Unit(benchmark::kMillisecond)
