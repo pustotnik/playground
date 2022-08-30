@@ -16,7 +16,8 @@ public:
     using Pointer      = char*;
     using ConstPointer = char const*;
 
-    constexpr static size_t DEFAULT_BLOCK_SIZE = 4*1024;
+    //constexpr static size_t DEFAULT_BLOCK_SIZE = 4*1024;
+    constexpr static size_t DEFAULT_BLOCK_SIZE = 2*1024;
 
     explicit BlocksBuffer(const size_t size = 0,
                             const size_t blockSize = DEFAULT_BLOCK_SIZE):
