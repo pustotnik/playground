@@ -12,7 +12,8 @@
 
 /*
 This class implements alternative version of MTCondVarProcessor.
-In theory this implemenation has better memory locality but uses more mutex locks.
+In theory this implemenation has better memory locality but uses more mutex locks
+or copying of blocks if blocks without a buffer (mmap).
 */
 
 class MTCondVarProcessor2 final: public BaseMTProcessor
@@ -32,6 +33,7 @@ private:
     void init() override;
 
     BlocksRing              _blocksQueue;
+    std::vector<LinesBlock> _localBlocks;
     std::mutex              _queueMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;

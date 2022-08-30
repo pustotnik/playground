@@ -21,6 +21,15 @@ MTCondVarProcessor2::MTCondVarProcessor2(size_t queueSize, size_t numOfConsThrea
             block.buffer.resize(maxLines);
         }
     });
+
+    auto numOfThreads = numOfConsThreads + 1;
+    _localBlocks.reserve(numOfThreads);
+    for(size_t i = 0; i < numOfThreads; ++i) {
+        // these blocks are used only when needsBuffer == false
+        LinesBlock block;
+        block.lines.reserve(maxLines);
+        _localBlocks.push_back(std::move(block));
+    }
 }
 
 void MTCondVarProcessor2::init() {
@@ -31,26 +40,47 @@ void MTCondVarProcessor2::init() {
 
 void MTCondVarProcessor2::readFileLines(FileReader& freader) {
 
-    LinesBlockPtr block = nullptr;
-
-    for(;;) {
-
-        unique_lock<mutex> lock(_queueMutex);
+    auto waitIfFull = [&](auto& lock) {
         if(_blocksQueue.full()) {
             _cvNonFull.wait(lock, [&](){ return !_blocksQueue.full(); });
         }
+    };
 
-        block = _blocksQueue.enqueuePrepare();
-        lock.unlock();
+    if(_needsBuffer) {
+        LinesBlockPtr block = nullptr;
+        for(;;) {
 
-        readInLinesBlock(freader, *block);
-        if(block->lines.empty()) {
-            break;
+            unique_lock<mutex> lock(_queueMutex);
+            waitIfFull(lock);
+
+            block = _blocksQueue.enqueuePrepare();
+            lock.unlock();
+
+            readInLinesBlock(freader, *block);
+            if(block->lines.empty()) {
+                break;
+            }
+
+            lock.lock();
+            _blocksQueue.enqueueCommit();
+            _cvNonEmpty.notify_one();
         }
+    }
+    else {
+        auto& block = _localBlocks[0];
+        for(;;) {
+            readInLinesBlock(freader, block);
+            if(block.lines.empty()) {
+                break;
+            }
 
-        lock.lock();
-        _blocksQueue.enqueueCommit();
-        _cvNonEmpty.notify_one();
+            unique_lock<mutex> lock(_queueMutex);
+            waitIfFull(lock);
+
+            *_blocksQueue.enqueuePrepare() = block;
+            _blocksQueue.enqueueCommit();
+            _cvNonEmpty.notify_one();
+        }
     }
 
     scoped_lock lock(_queueMutex);
@@ -63,7 +93,7 @@ void MTCondVarProcessor2::filterLines(size_t idx,
 
     size_t counter = 0;
     LinesBlockPtr block = nullptr;
-    bool notify;
+    auto& blockCopy = _localBlocks[idx + 1];
 
     for(;;) {
 
@@ -76,15 +106,27 @@ void MTCondVarProcessor2::filterLines(size_t idx,
         }
 
         block = _blocksQueue.dequeuePrepare(idx);
-        lock.unlock();
+        if(_needsBuffer) {
+            lock.unlock();
 
-        counter += filterBlock(wcmatch, pattern, *block);
+            counter += filterBlock(wcmatch, pattern, *block);
 
-        lock.lock();
-        _blocksQueue.dequeueCommit(idx);
-        notify = _needsBuffer ? _blocksQueue.size() <= 1 : _blocksQueue.empty();
-        if(notify) {
-            _cvNonFull.notify_one();
+            lock.lock();
+            _blocksQueue.dequeueCommit(idx);
+            if(_blocksQueue.size() <= 1) {
+                _cvNonFull.notify_one();
+            }
+        }
+        else {
+            // in this case it is faster to copy block
+            blockCopy = *block;
+            _blocksQueue.dequeueCommit(idx);
+            if(_blocksQueue.empty()) {
+                _cvNonFull.notify_one();
+            }
+            lock.unlock();
+
+            counter += filterBlock(wcmatch, pattern, blockCopy);
         }
     }
 
