@@ -71,144 +71,231 @@ Benchmark                                                                       
 
 ===== Single-threaded solution
 
-BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:1/real_time                                           9002 ms         9001 ms
-BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:4/real_time                                           9257 ms         9257 ms
-BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:20/real_time                                          9220 ms         9220 ms
-BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:40/real_time                                          9262 ms         9262 ms
-BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:1/real_time                                         8563 ms         8563 ms
-BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:4/real_time                                         8857 ms         8857 ms
-BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:20/real_time                                        8815 ms         8815 ms
-BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:40/real_time                                        8757 ms         8756 ms
-BM_Sequential<MMapReader, MyWildcardMatch>/mlines:1/real_time                                            7061 ms         7061 ms
-BM_Sequential<MMapReader, MyWildcardMatch>/mlines:4/real_time                                            7247 ms         7247 ms
-BM_Sequential<MMapReader, MyWildcardMatch>/mlines:20/real_time                                           7271 ms         7271 ms
-BM_Sequential<MMapReader, MyWildcardMatch>/mlines:40/real_time                                           7183 ms         7183 ms
-BM_Sequential<FGetsReader, FNMatch>/mlines:1/real_time                                                  11071 ms        11070 ms
-BM_Sequential<FGetsReader, FNMatch>/mlines:4/real_time                                                  11325 ms        11325 ms
-BM_Sequential<FGetsReader, FNMatch>/mlines:20/real_time                                                 11204 ms        11202 ms
-BM_Sequential<FGetsReader, FNMatch>/mlines:40/real_time                                                 11270 ms        11270 ms
-BM_Sequential<FStreamReader, FNMatch>/mlines:1/real_time                                                10667 ms        10667 ms
-BM_Sequential<FStreamReader, FNMatch>/mlines:4/real_time                                                10927 ms        10925 ms
-BM_Sequential<FStreamReader, FNMatch>/mlines:20/real_time                                               10839 ms        10838 ms
-BM_Sequential<FStreamReader, FNMatch>/mlines:40/real_time                                               10724 ms        10724 ms
-BM_Sequential<MMapReader, FNMatch>/mlines:1/real_time                                                    9119 ms         9119 ms
-BM_Sequential<MMapReader, FNMatch>/mlines:4/real_time                                                    9253 ms         9253 ms
-BM_Sequential<MMapReader, FNMatch>/mlines:20/real_time                                                   9126 ms         9126 ms
-BM_Sequential<MMapReader, FNMatch>/mlines:40/real_time                                                   9094 ms         9094 ms
+BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:1/real_time                                           8995 ms         8993 ms
+BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:4/real_time                                           9287 ms         9287 ms
+BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:16/real_time                                          9328 ms         9327 ms
+BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:32/real_time                                          9332 ms         9331 ms
+BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:1/real_time                                         8581 ms         8580 ms
+BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:4/real_time                                         8814 ms         8814 ms
+BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:16/real_time                                        8784 ms         8784 ms
+BM_Sequential<FStreamReader, MyWildcardMatch>/mlines:32/real_time                                        8735 ms         8734 ms
+BM_Sequential<MMapReader, MyWildcardMatch>/mlines:1/real_time                                            7105 ms         7105 ms
+BM_Sequential<MMapReader, MyWildcardMatch>/mlines:4/real_time                                            7265 ms         7264 ms
+BM_Sequential<MMapReader, MyWildcardMatch>/mlines:16/real_time                                           7327 ms         7326 ms
+BM_Sequential<MMapReader, MyWildcardMatch>/mlines:32/real_time                                           7242 ms         7240 ms
+BM_Sequential<FGetsReader, FNMatch>/mlines:1/real_time                                                  11165 ms        11165 ms
+BM_Sequential<FGetsReader, FNMatch>/mlines:4/real_time                                                  11446 ms        11446 ms
+BM_Sequential<FGetsReader, FNMatch>/mlines:16/real_time                                                 11443 ms        11443 ms
+BM_Sequential<FGetsReader, FNMatch>/mlines:32/real_time                                                 11478 ms        11471 ms
+BM_Sequential<FStreamReader, FNMatch>/mlines:1/real_time                                                10840 ms        10839 ms
+BM_Sequential<FStreamReader, FNMatch>/mlines:4/real_time                                                10984 ms        10984 ms
+BM_Sequential<FStreamReader, FNMatch>/mlines:16/real_time                                               10840 ms        10840 ms
+BM_Sequential<FStreamReader, FNMatch>/mlines:32/real_time                                               10835 ms        10835 ms
+BM_Sequential<MMapReader, FNMatch>/mlines:1/real_time                                                    9292 ms         9292 ms
+BM_Sequential<MMapReader, FNMatch>/mlines:4/real_time                                                    9415 ms         9415 ms
+BM_Sequential<MMapReader, FNMatch>/mlines:16/real_time                                                   9355 ms         9355 ms
+BM_Sequential<MMapReader, FNMatch>/mlines:32/real_time                                                   9361 ms         9361 ms
 
 ===== Multi-threaded solution as single producer and many consumers with conditional variables
 
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time            9725 ms        16890 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time           6931 ms        11452 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time            6910 ms        19269 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time           4464 ms        12354 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time           4858 ms        14956 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time           4705 ms        14966 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time           5926 ms        16483 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time           5617 ms        15072 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time          5609 ms        15092 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time           5809 ms        14753 ms
-BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time           5662 ms        16801 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time          9923 ms        16435 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time         6749 ms        10121 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time          6565 ms        17654 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time         3422 ms         9762 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time         3623 ms        12658 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time         3590 ms        12540 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time         3405 ms        11899 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time         3593 ms        12306 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time        3843 ms        13423 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time         4084 ms        13705 ms
-BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time         4161 ms        16146 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time             9480 ms        14734 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time            6840 ms         8286 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time             7045 ms        17452 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time            3655 ms         8322 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time            2843 ms         9666 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time            2607 ms         8577 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time            2402 ms         7725 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time            2438 ms         7837 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time           2439 ms         7878 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time            1897 ms        13059 ms
-BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time            2105 ms        13976 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time            8144 ms        14062 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time            6862 ms        11049 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time            6898 ms        10978 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time           6843 ms        10894 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time            4521 ms        14515 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time            4376 ms        14238 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time            4451 ms        14230 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time           4359 ms        14056 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time           4369 ms        14256 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time          4379 ms        14218 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time           4115 ms        13214 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time           3999 ms        12989 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time          3962 ms        13001 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time           4289 ms        12733 ms
+BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time          4335 ms        12893 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time          7861 ms        12901 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time          6524 ms         9652 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time          6690 ms         9720 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time         6581 ms         9465 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time          3228 ms        11493 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time          3148 ms        11288 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time          3205 ms        11434 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time         3272 ms        11817 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time         3239 ms        11648 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time        3194 ms        11602 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time         2996 ms        10774 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time         3114 ms        11284 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time        3220 ms        11395 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time         3423 ms        12721 ms
+BM_MTCondVar<FStreamReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time        3434 ms        12705 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time             8329 ms        12389 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time             6805 ms         8281 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time             6908 ms         8147 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time            6929 ms         7992 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time             2636 ms         8735 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time             2566 ms         8329 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time             2504 ms         8017 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time            2500 ms         8028 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time            2553 ms         8056 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time           2514 ms         7842 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time            2520 ms         8094 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time            2448 ms         7770 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time           2526 ms         7977 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time            1895 ms        12724 ms
+BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time           1897 ms        12701 ms
+
+===== Multi-threaded solution as single producer and many consumers with conditional variables (2)
+
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time          12321 ms        20406 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time           7072 ms        11718 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time           6513 ms        10057 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time          6636 ms        10247 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time           6834 ms        14078 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time           4728 ms        13573 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time           3862 ms        13270 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time          3864 ms        13164 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time          3762 ms        12908 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time         3732 ms        13172 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time          4431 ms        12519 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time          3540 ms        11499 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time         3484 ms        12032 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time          3985 ms        12499 ms
+BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time         4045 ms        12706 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time        11600 ms        18993 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time         6934 ms        10794 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time         6519 ms         9302 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time        6721 ms         9551 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time         6534 ms        13562 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time         4292 ms        12658 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time         3613 ms        12296 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time        3312 ms        11575 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time        3362 ms        11824 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time       3196 ms        11458 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time        3817 ms        11160 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time        3101 ms        10690 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time       3125 ms        11263 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time        3425 ms        12709 ms
+BM_MTCondVar2<FStreamReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time       3438 ms        12753 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time            8369 ms        12405 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time            6852 ms         8357 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time            6970 ms         8242 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time           6862 ms         7966 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time            2627 ms         8704 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time            2591 ms         8408 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time            2524 ms         8101 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time           2507 ms         8041 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time           2655 ms         8246 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time          2548 ms         8013 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time           2511 ms         8129 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time           2439 ms         7794 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time          2506 ms         8096 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time           1902 ms        12831 ms
+BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time          2015 ms        13559 ms
 
 ===== Multi-threaded solution as single producer and many consumers without locks
 
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time           7875 ms        15751 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time          6766 ms        13530 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time           5032 ms        15096 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time          4354 ms        13060 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time          4256 ms        17017 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time          6072 ms        24280 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time          6407 ms        25562 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time          6186 ms        24634 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time         6457 ms        25615 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time         10286 ms        79957 ms
-BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time         10269 ms        81054 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time         7779 ms        15557 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time        6422 ms        12843 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time         4350 ms        13047 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time        3307 ms         9919 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time        3031 ms        12123 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time        3819 ms        15273 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time        3974 ms        15886 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time        3900 ms        15566 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time       3912 ms        15519 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time        7437 ms        58185 ms
-BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time        7367 ms        57775 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time            7170 ms        14124 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time           6480 ms        12754 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time            3970 ms        11503 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time           3368 ms         9697 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time           2332 ms         8723 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time           2329 ms         8704 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time           2403 ms         8989 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time           2554 ms         9591 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time          2554 ms         9587 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time           2269 ms        16165 ms
-BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time           2225 ms        16107 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time           6936 ms        13871 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time           6529 ms        13056 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time           6543 ms        13085 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time          6471 ms        12941 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time           3726 ms        14903 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time           3751 ms        15002 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time           4325 ms        17297 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time          4320 ms        17277 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time          4220 ms        16877 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time         4314 ms        17248 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time          4327 ms        17307 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time          4252 ms        17007 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time         4266 ms        17061 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time          6548 ms        51614 ms
+BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time         6476 ms        50941 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time         6821 ms        13640 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time         6237 ms        12473 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time         6199 ms        12397 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time        6198 ms        12394 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time         2642 ms        10568 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time         2519 ms        10077 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time         2637 ms        10546 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time        2852 ms        11406 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time        2862 ms        11447 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time       2903 ms        11609 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time        2848 ms        11392 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time        2826 ms        11303 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time       2840 ms        11353 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time        4698 ms        36592 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time       4726 ms        37382 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time            6745 ms        13225 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time            6461 ms        12687 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time            6449 ms        12662 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time           6439 ms        12641 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time            2328 ms         8612 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time            2314 ms         8562 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time            2350 ms         8707 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time           2323 ms         8594 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time           2342 ms         8674 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time          2501 ms         9292 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time           2538 ms         9440 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time           2547 ms         9476 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time          2557 ms         9515 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time           2224 ms        15984 ms
+BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time          2215 ms        15961 ms
 
 ===== Multi-threaded solution as single producer and many consumers with semaphores (since C++20)
 
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time               10844 ms        21652 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time               7282 ms        13430 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time                8092 ms        22411 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time               5429 ms        13508 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time               5013 ms        17125 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time               5042 ms        17082 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time               5939 ms        16109 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time               6023 ms        16591 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time              6093 ms        16923 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time               7244 ms        25240 ms
-BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time               6677 ms        19933 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time             10588 ms        21127 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time             7098 ms        12284 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time              8377 ms        20039 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time             4284 ms        10724 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time             3596 ms        13451 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time             3727 ms        13451 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time             3667 ms        13458 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time             3882 ms        14253 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time            3941 ms        14455 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time             5569 ms        24509 ms
-BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time             4681 ms        18752 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:10/process_time/real_time                 9931 ms        19610 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:100/process_time/real_time                7207 ms        10297 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:3/threads:3/mlines:10/process_time/real_time                 5585 ms        15553 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:3/threads:3/mlines:100/process_time/real_time                3889 ms         9587 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:1/threads:4/mlines:100/process_time/real_time                2710 ms         9753 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:100/process_time/real_time                2598 ms         9229 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:500/process_time/real_time                2557 ms         8608 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:500/process_time/real_time                2594 ms         8767 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:500/process_time/real_time               2602 ms         8793 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:200/process_time/real_time                2145 ms        15117 ms
-BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:500/process_time/real_time                2208 ms        15476 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time                8737 ms        17373 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time                7282 ms        13079 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time                7209 ms        12994 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time               7158 ms        12898 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time                4564 ms        15740 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time                4436 ms        15669 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time                4433 ms        15911 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time               4389 ms        15684 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time               4750 ms        16564 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time              4768 ms        16833 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time               4176 ms        14500 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time               4369 ms        14377 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time              4293 ms        14485 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time               5462 ms        21048 ms
+BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time              5478 ms        21083 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time              8585 ms        16995 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time              6935 ms        11796 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time              7002 ms        11896 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time             7084 ms        11999 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time              3124 ms        11830 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time              3138 ms        11830 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time              3199 ms        11697 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time             3180 ms        11882 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time             3480 ms        13010 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time            3479 ms        10406 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time             3116 ms        11504 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time             3202 ms        11854 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time            3139 ms        11485 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time             4278 ms        19779 ms
+BM_MTSem<FStreamReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time            4328 ms        20006 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time                 8794 ms        17079 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time                 7178 ms        10367 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time                 7190 ms        10348 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time                7168 ms        10343 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time                 2546 ms         8999 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time                 2531 ms         8868 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time                 2542 ms         8883 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time                2508 ms         8782 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time                2493 ms         8703 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time               2491 ms         8681 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time                2427 ms         8129 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time                2648 ms         8896 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time               2671 ms         9032 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time                2218 ms        15257 ms
+BM_MTSem<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time               2225 ms        15445 ms
 
 ```
 
 - BM_Sequential   - Single-threaded implementation
 - BM_MTCondVar    - Multi-threaded implementation as a Producer-Consumer solution using
                     mutex and condition variables.
+- BM_MTCondVar2   - An alternative version of BM_MTCondVar. In theory it has better
+                    memory locality but uses more mutex locks or copying of blocks
+                    if blocks without a buffer (mmap).
 - BM_MTLockFree   - Multi-threaded implementation as a Producer-Consumer solution
                     with atomic variables without any locks (busy-waiting).
 - BM_MTSem        - Multi-threaded implementation as a Producer-Consumer solution using
@@ -234,15 +321,17 @@ On different OS/hardware/implementation the results can be different.
 - FNMatch works a little bit slower than MyWildcardMatch just because fnmatch
   requires C string terminated with '\0' and I had to make copy of each file
   line because it is requirement of my interface (string_view is used).
-- There is no reason to use number of read/filtered lines at one time more than
-  one for single-threaded implementation.
+- There is no reason to use number of read/filtered lines more than
+  one at one time for single-threaded implementation.
   But it is important for multi-threaded implementation.
-- It is often optimal to set size of queue to number of threads.
 - Increasing number of threads in multi-threaded implementation is not always
   optimal decision. But it is because file I/O is bottleneck for this task.
-- Lock free solution is not the best choice for a common case.
-- MTSem (semaphores) is very similar to the MTCondVar (condition variables)
-  in terms of performance but the MTCondVar is better.
+- Lock-free/busy-waiting solution is not the best choice for a common case.
+- MTSem (semaphores) is similar to the MTCondVar (condition variables)
+  in terms of performance but the MTCondVar is a little bit better.
+- Memory/data locality is important for general performance.
+- For perfomance reason it is better to hold size of memory for
+  queue (ring buffer) and all blocks with data less than CPU L3 cache size.
 
 ## About mmap
 The **mmap** in these benchmarks are fastest but you should to know that it was warm run and the
@@ -270,7 +359,7 @@ As I understand the mmap is a good method to read the same file several times an
 for a random access (especially on SSD).
 Also I can recommend to read [this](https://sasha-f.medium.com/why-mmap-is-faster-than-system-calls-24718e75ab37).
 
-## About lock-free solution
+## About wait-free/busy-waiting solution
 In this solution I used wait-free and lock free implementation of
 ring buffer from https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular.
 This container is thread-safe but only for single producer and single consumer variant.
@@ -280,8 +369,9 @@ performance than solution with conditional variables but not always.
 The main problem with this is busy-waiting on CPU when these queues are full or empty.
 Look at the column "CPU" to see the proof. And if you set number of threads
 more than necessery for optimal processing then a lot of time this code will
-just "burn" CPU cores what is not good at all.
-So be careful with such lock-free solutions. You should understand what you are doing.
+just "burn" CPU cores what is not good at all. But such a way can help in some cases and
+with law latency for example.
+So be careful with such busy-waiting solutions. You should understand what you are doing.
 
 ## About spinlocks
 I used spinlocks a lot in the past (as the spin_mutex from Intel TBB)
@@ -290,3 +380,11 @@ and you can find a lot of variants on the internet how to implement such a thing
 Also I can recommend to read this: https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723
 Nevertheless as I know modern implementations of std::mutex already use similar
 thing inside for a short waitings and I think this is enough already.
+
+## Memory locality
+This can improve performance but you must be accurate in
+a way how to achieve it. I improved memory locality for any reading/filtering
+in the case of using a buffer (FGetsReader, FStreamReader). Also I tried to do it
+for a ring buffer and made MTCondVar2 but I had to use more mutex locks or
+copying of current block and benchmarks showed that for current task the MTCondVar
+is better in terms of performance.
