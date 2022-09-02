@@ -49,8 +49,8 @@ private:
     // it is called in the 'execute' method after all threads finished
     virtual size_t calcFinalResult() const;
 
+    const size_t _numOfConsThreads;
     const size_t _maxLines;
-    Threads      _threads;
 };
 
 inline void BaseMTProcessor::readInLinesBlock(FileReader& freader, LinesBlock& block) {
