@@ -17,7 +17,7 @@
 MESSAGE(STATUS "Running cmake version ${CMAKE_VERSION}")
 
 cmake_minimum_required(VERSION 3.10)
-project(CpuCache VERSION 0.1 LANGUAGES CXX)
+project(FWCMatch VERSION 0.1 LANGUAGES CXX)
 
 # Disable in-source builds to prevent source tree corruption.
 # https://github.com/opencv/opencv/blob/master/CMakeLists.txt
