@@ -17,9 +17,10 @@ C/C++ **fgets**, C++ **iostream** and Linux **mmap**.
 For wildcard matching I used my general implementation of
 the wildcard matching algorithm based on this [solution](https://yucoding.blogspot.com/2013/02/leetcode-question-123-wildcard-matching.html) and the POSIX fnmatch function.
 Also I implemented wildcard matching with
-C++ standard regex library but it works really slow.
-But I had no purpose to benchmark wildcard algorithms.
-And I implemented this as a single-threaded and as a multi-threaded solutions.
+C++ standard regex library (regexwildcard.cpp/h) but it works really slow and
+I decided not to use this implementation.
+Anyway I had no purpose to benchmark wildcard algorithms.
+I implemented single-threaded and multi-threaded solutions.
 Also I wanted to play with such paramenters as number of read/filtered
 lines at one time and number of threads.
 
@@ -41,6 +42,9 @@ cmake -S . -B build
 cmake --build build
 BENCH_FILENAME="/files/tmp/unison.log" BENCH_PATTERN="*failed*" ./build/fwcmatch-bench
 ```
+
+Build dependencies:
+- [Google Benchmark](https://github.com/google/benchmark) (dev-cpp/benchmark in Gentoo)
 
 ## The results
 
