@@ -35,7 +35,12 @@ To build and run I used my build system like this (from directory playground/fwc
 BENCH_FILENAME="/files/tmp/_unison.log" BENCH_PATTERN="*failed*" zenmake run
 ```
 
-But CMakeLists.txt for cmake build system is also provided.
+But CMakeLists.txt for cmake build system is also provided:
+```
+cmake -S . -B build
+cmake --build build
+BENCH_FILENAME="/files/tmp/unison.log" BENCH_PATTERN="*failed*" ./build/fwcmatch-bench
+```
 
 ## The results
 
