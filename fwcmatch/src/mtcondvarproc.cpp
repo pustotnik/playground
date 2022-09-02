@@ -51,6 +51,7 @@ guarantee visibility of these changes in all threads:
 
     See also section "Release-Acquire ordering" here:
     https://en.cppreference.com/w/cpp/atomic/memory_order
+    And this: https://preshing.com/20130823/the-synchronizes-with-relation/
 */
 
 void MTCondVarProcessor::readFileLines(FileReader& freader) {
@@ -82,6 +83,7 @@ void MTCondVarProcessor::readFileLines(FileReader& freader) {
 void MTCondVarProcessor::filterLines(size_t idx,
                             WildcardMatch& wcmatch, const string& pattern) {
 
+    assert(idx < _counters.size());
     size_t counter = 0;
     auto& block = _firstBlocks[idx + 1];
 
