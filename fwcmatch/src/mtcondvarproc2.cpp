@@ -8,19 +8,12 @@ using namespace std;
 
 MTCondVarProcessor2::MTCondVarProcessor2(size_t queueSize, size_t numOfConsThreads,
                                         size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines),
-    _blocksQueue(queueSize, numOfConsThreads),
-    _maxLines(maxLines),
-    _needsBuffer(needsBuffer) {
+    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer),
+    _blocksQueue(queueSize, numOfConsThreads) {
 
     assert(queueSize > 0);
 
-    _blocksQueue.apply([&](LinesBlock& block) {
-        block.lines.reserve(maxLines);
-        if(needsBuffer) {
-            block.buffer.resize(maxLines);
-        }
-    });
+    _blocksQueue.apply([&](LinesBlock& block) { initLinesBlock(block); });
 
     auto numOfThreads = numOfConsThreads + 1;
     _localBlocks.reserve(numOfThreads);

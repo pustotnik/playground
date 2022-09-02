@@ -8,10 +8,8 @@ using namespace std;
 
 MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads,
                                         size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines),
-    _blocksQueue(queueSize),
-    _maxLines(maxLines),
-    _needsBuffer(needsBuffer) {
+    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer),
+    _blocksQueue(queueSize) {
 
     assert(queueSize > 0);
 

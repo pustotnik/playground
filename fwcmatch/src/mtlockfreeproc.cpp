@@ -8,8 +8,7 @@ using namespace std;
 
 MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads,
                                         size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines),
-    _needsBuffer(needsBuffer) {
+    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer) {
 
     assert(queueSize > 0);
 
@@ -17,10 +16,7 @@ MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThrea
     for(size_t i = 0; i < numOfConsThreads; ++i) {
         auto cinfo = make_unique<ConsumerInfo>(queueSize);
         cinfo->blocksQueue.apply([&](LinesBlock& block) {
-            block.lines.reserve(maxLines);
-            if(_needsBuffer) {
-                block.buffer.resize(maxLines, BlocksBuffer::DEFAULT_BLOCK_SIZE);
-            }
+            initLinesBlock(block);
         });
         _consThreadInfo.push_back(std::move(cinfo));
     }

@@ -30,19 +30,10 @@ private:
 
     void init() override;
 
-    void initLinesBlock(LinesBlock& block) {
-        block.lines.reserve(_maxLines);
-        if(_needsBuffer) {
-            block.buffer.resize(_maxLines, BlocksBuffer::DEFAULT_BLOCK_SIZE);
-        }
-    }
-
     BlocksRing              _blocksQueue;
     std::vector<LinesBlock> _firstBlocks;
     std::mutex              _queueMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
-    const size_t            _maxLines;
-    const bool              _needsBuffer;
     bool                    _stop        { false };
 };

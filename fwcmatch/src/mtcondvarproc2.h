@@ -37,7 +37,5 @@ private:
     std::mutex              _queueMutex;
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
-    const size_t            _maxLines;
-    const bool              _needsBuffer;
     bool                    _stop        { false };
 };

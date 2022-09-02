@@ -16,7 +16,7 @@ class BaseMTProcessor: private noncopyable
 {
 public:
 
-    BaseMTProcessor(size_t numOfConsThreads, size_t maxLines);
+    BaseMTProcessor(size_t numOfConsThreads, size_t maxLines, bool needsBuffer);
     virtual ~BaseMTProcessor();
 
     size_t execute(FileReader& freader, const std::string& filename,
@@ -31,10 +31,15 @@ protected:
     size_t filterBlock(WildcardMatch& wcmatch, const std::string& pattern,
                                                         LinesBlock const& block);
 
+    void initLinesBlock(LinesBlock& block,
+                    const size_t blockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE);
+
     std::vector<size_t> _counters;
+    const size_t        _numOfConsThreads;
+    const size_t        _maxLines;
+    const bool          _needsBuffer;
 
 private:
-    using Threads = std::vector<std::thread>;
 
     // it is called in the 'execute' method in the beginning (so threads haven't started yet)
     virtual void init() = 0;
@@ -48,9 +53,6 @@ private:
     // gather all counters from all consumers
     // it is called in the 'execute' method after all threads finished
     virtual size_t calcFinalResult() const;
-
-    const size_t _numOfConsThreads;
-    const size_t _maxLines;
 };
 
 inline void BaseMTProcessor::readInLinesBlock(FileReader& freader, LinesBlock& block) {
@@ -89,6 +91,13 @@ inline size_t BaseMTProcessor::filterBlock(WildcardMatch& wcmatch,
     );
 
     return counter;
+}
+
+inline void BaseMTProcessor::initLinesBlock(LinesBlock& block, const size_t blockSize) {
+    block.lines.reserve(_maxLines);
+    if(_needsBuffer) {
+        block.buffer.resize(_maxLines, blockSize);
+    }
 }
 
 inline size_t BaseMTProcessor::calcFinalResult() const {

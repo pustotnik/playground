@@ -10,19 +10,18 @@ static LinesBlockPtr TERM_BLOCK = reinterpret_cast<LinesBlockPtr>(-1);
 
 MTSemProcessor::MTSemProcessor(size_t queueSize, size_t numOfConsThreads,
                                             size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines),
+    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer),
     // for each block in queue and for each thread for waiting
     _blocksPool(queueSize + numOfConsThreads + 1, maxLines),
-    _blocksQueue(queueSize),
-    _numOfThreads(numOfConsThreads + 1),
-    _needsBuffer(needsBuffer) {
+    _blocksQueue(queueSize) {
 
     assert(queueSize > 0);
 
-    _blocksPool.reset(_needsBuffer);
+    _blocksPool.reset(needsBuffer);
 
-    _firstBlocks.reserve(_numOfThreads);
-    for(size_t i = 0; i < _numOfThreads; ++i) {
+    auto numOfThreads = numOfConsThreads + 1;
+    _firstBlocks.reserve(numOfThreads);
+    for(size_t i = 0; i < numOfThreads; ++i) {
         _firstBlocks.push_back(_blocksPool.allocBlock());
     }
 

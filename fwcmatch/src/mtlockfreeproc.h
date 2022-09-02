@@ -55,7 +55,6 @@ private:
 
     VectorOfConsumerInfo _consThreadInfo;
     std::atomic<bool>    _stop { false };
-    const bool           _needsBuffer;
 };
 
 inline size_t MTLockFreeProcessor::calcFinalResult() const {

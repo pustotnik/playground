@@ -38,6 +38,4 @@ private:
     std::mutex                 _queueMutex;
     std::unique_ptr<Semaphore> _semEmpty;
     std::unique_ptr<Semaphore> _semFull;
-    const size_t               _numOfThreads;
-    const bool                 _needsBuffer;
 };
