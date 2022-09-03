@@ -116,7 +116,7 @@ BM_Sequential<MMapReader, FNMatch>/mlines:32/real_time                          
 </details>
 
 <details open>
-<summary>Multi-threaded solution as single producer and many consumers with conditional variables</summary>
+<summary>Multi-threaded solution with conditional variables</summary>
 
 ```
 BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time            8144 ms        14062 ms
@@ -168,7 +168,7 @@ BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_
 </details>
 
 <details open>
-<summary>Multi-threaded solution as single producer and many consumers with conditional variables (2)</summary>
+<summary>Multi-threaded solution with conditional variables (2)</summary>
 
 ```
 BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time          12321 ms        20406 ms
@@ -220,7 +220,7 @@ BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process
 </details>
 
 <details open>
-<summary>Multi-threaded solution as single producer and many consumers without locks</summary>
+<summary>Multi-threaded solution with atomic and busy-waiting</summary>
 
 ```
 BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time           6936 ms        13871 ms
@@ -272,7 +272,59 @@ BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process
 </details>
 
 <details open>
-<summary>Multi-threaded solution as single producer and many consumers with semaphores (since C++20)</summary>
+<summary>Multi-threaded solution with atomic and busy-waiting (2)</summary>
+
+```
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time               7065 ms        14128 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time               6585 ms        13168 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time               6566 ms        13131 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time              6546 ms        13091 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time               3850 ms        15398 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time               3835 ms        15341 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time               3847 ms        15389 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time              3841 ms        15363 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time              3862 ms        15449 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time             3890 ms        15560 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time              4123 ms        16492 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time              4171 ms        16685 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time             4256 ms        17021 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time              6535 ms        51291 ms
+BM_MTMPMC<FGetsReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time             5946 ms        47330 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time             6663 ms        13324 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time             6241 ms        12482 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time             6217 ms        12435 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time            6194 ms        12387 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time             2562 ms        10247 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time             2546 ms        10183 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time             2536 ms        10142 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time            2608 ms        10433 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time            2854 ms        11416 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time           2854 ms        11413 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time            2804 ms        11214 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time            2806 ms        11222 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time           2807 ms        11228 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time            4476 ms        35127 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time           4357 ms        34493 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time                6849 ms        13469 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time                6447 ms        12674 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time                6449 ms        12677 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:32/threads:2/mlines:96/process_time/real_time               6442 ms        12663 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:2/threads:4/mlines:96/process_time/real_time                2322 ms         8626 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:96/process_time/real_time                2327 ms         8653 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:96/process_time/real_time                2319 ms         8618 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:96/process_time/real_time               2316 ms         8601 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:32/threads:4/mlines:96/process_time/real_time               2320 ms         8620 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:128/threads:4/mlines:96/process_time/real_time              2352 ms         8744 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:4/threads:4/mlines:256/process_time/real_time               2463 ms         9176 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/real_time               2517 ms         9388 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time              2543 ms         9494 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time               2173 ms        15722 ms
+BM_MTMPMC<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time              2195 ms        15828 ms
+```
+</details>
+
+<details open>
+<summary>Multi-threaded solution with semaphores (since C++20)</summary>
 
 ```
 BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time                8737 ms        17373 ms
@@ -331,7 +383,8 @@ BM_MTSem<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time
                     memory locality but uses more mutex locks or copying of blocks
                     if blocks without a buffer (mmap).
 - BM_MTLockFree   - Multi-threaded implementation as a Producer-Consumer solution
-                    with atomic variables without any locks (busy-waiting).
+                    using atomic and busy-waiting ring buffer based on [this](https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular).
+- BM_MTMPMC       - Similar to BM_MTLockFree but uses MPMCQueue from [here](https://github.com/rigtorp/MPMCQueue).
 - BM_MTSem        - Multi-threaded implementation as a Producer-Consumer solution using
                     mutex and semaphores.
 - FGetsReader     - The fgets is used

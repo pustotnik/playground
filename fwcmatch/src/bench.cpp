@@ -17,6 +17,7 @@
 #include "mtcondvarproc2.h"
 #include "mtlockfreeproc.h"
 #include "mtsemproc.h"
+#include "mtmpmcproc.h"
 
 using namespace std;
 
@@ -127,6 +128,11 @@ void BM_MTSem(benchmark::State& state) {
     MTProdConsTempl<MTSemProcessor, FReader, WildcardMatch>(state);
 }
 
+template<typename FReader, typename WildcardMatch>
+void BM_MTMPMC(benchmark::State& state) {
+    MTProdConsTempl<MPMCProcessor, FReader, WildcardMatch>(state);
+}
+
 static void genMultithreadingArguments(benchmark::internal::Benchmark* b) {
     b
     // queueSize, numOfThreads, maxLines
@@ -191,6 +197,15 @@ BENCHMARK(BM_MTSem<FStreamReader, MyWildcardMatch>)
     ->Apply(genMultithreadingArguments);
 
 BENCHMARK(BM_MTSem<MMapReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
+
+BENCHMARK(BM_MTMPMC<FGetsReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
+
+BENCHMARK(BM_MTMPMC<FStreamReader, MyWildcardMatch>)
+    ->Apply(genMultithreadingArguments);
+
+BENCHMARK(BM_MTMPMC<MMapReader, MyWildcardMatch>)
     ->Apply(genMultithreadingArguments);
 
 // Run the benchmarks

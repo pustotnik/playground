@@ -59,6 +59,7 @@ set(SRC_LIST
     src/mtcondvarproc.cpp
     src/mtcondvarproc2.cpp
     src/mtlockfreeproc.cpp
+    src/mtmpmcproc.cpp
     src/mtsemproc.cpp
     src/mywildcard.cpp
     src/regexwildcard.cpp

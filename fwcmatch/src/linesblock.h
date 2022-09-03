@@ -200,6 +200,8 @@ public:
     // get max number of lines
     size_t maxLines() const noexcept { return _maxLines; }
 
+    size_t capacity() const noexcept { return _blocks.capacity(); }
+
 private:
     using VectorOfBlocks = std::vector<LinesBlock>;
     using BlockPtrsRing  = SimpleRingBuffer<LinesBlockPtr>;

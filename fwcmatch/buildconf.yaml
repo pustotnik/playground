@@ -10,7 +10,7 @@ tasks:
 configure:
   - do: check-libs
 
-# Results with -flto with g++ (11.2.1) aren't stable. Some tests get bet
+# Results with -flto with g++ (11.2.1) aren't stable. Some tests get
 # better performance while some others don't get it and this draws a strange picture.
 # So I decided to turn off -flto for this project.
 CMN_CXXFLAGS: -Wall -Wextra -std=c++20 -fno-rtti #-flto
