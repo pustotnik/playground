@@ -47,8 +47,13 @@ Build dependencies:
 - [Google Benchmark](https://github.com/google/benchmark) (dev-cpp/benchmark in Gentoo)
 
 ## The results
+<details>
+<summary>
 
 #### Testing environment
+
+</summary>
+
 - HP Elitebook 850 g5
 - CPU: Intel(R) Core(TM) i5-8250U (4 cores 8 threads)
 - Memory: 16GB
@@ -66,6 +71,7 @@ Build dependencies:
   - L1 Instruction 32 KiB (x4)
   - L2 Unified 256 KiB (x4)
   - L3 Unified 6144 KiB (x1)
+</details>
 
 #### Output
 I created a 4GB file from my own unison.log and used the
