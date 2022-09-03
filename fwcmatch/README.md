@@ -47,7 +47,7 @@ Build dependencies:
 - [Google Benchmark](https://github.com/google/benchmark) (dev-cpp/benchmark in Gentoo)
 
 ## The results
-<details>
+<details open>
 <summary>
 
 #### Testing environment
@@ -83,9 +83,11 @@ Some fields were cut off for shortance.
 ----------------------------------------------------------------------------------------------------------------------------------
 Benchmark                                                                                                   Time             CPU
 ----------------------------------------------------------------------------------------------------------------------------------
+```
+<details open>
+<summary>Single-threaded solution</summary>
 
-===== Single-threaded solution
-
+```
 BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:1/real_time                                           8995 ms         8993 ms
 BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:4/real_time                                           9287 ms         9287 ms
 BM_Sequential<FGetsReader, MyWildcardMatch>/mlines:16/real_time                                          9328 ms         9327 ms
@@ -110,9 +112,13 @@ BM_Sequential<MMapReader, FNMatch>/mlines:1/real_time                           
 BM_Sequential<MMapReader, FNMatch>/mlines:4/real_time                                                    9415 ms         9415 ms
 BM_Sequential<MMapReader, FNMatch>/mlines:16/real_time                                                   9355 ms         9355 ms
 BM_Sequential<MMapReader, FNMatch>/mlines:32/real_time                                                   9361 ms         9361 ms
+```
+</details>
 
-===== Multi-threaded solution as single producer and many consumers with conditional variables
+<details open>
+<summary>Multi-threaded solution as single producer and many consumers with conditional variables</summary>
 
+```
 BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time            8144 ms        14062 ms
 BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time            6862 ms        11049 ms
 BM_MTCondVar<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time            6898 ms        10978 ms
@@ -158,9 +164,13 @@ BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_t
 BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time           2526 ms         7977 ms
 BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time            1895 ms        12724 ms
 BM_MTCondVar<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time           1897 ms        12701 ms
+```
+</details>
 
-===== Multi-threaded solution as single producer and many consumers with conditional variables (2)
+<details open>
+<summary>Multi-threaded solution as single producer and many consumers with conditional variables (2)</summary>
 
+```
 BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time          12321 ms        20406 ms
 BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time           7072 ms        11718 ms
 BM_MTCondVar2<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time           6513 ms        10057 ms
@@ -206,9 +216,13 @@ BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_
 BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time          2506 ms         8096 ms
 BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time           1902 ms        12831 ms
 BM_MTCondVar2<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time          2015 ms        13559 ms
+```
+</details>
 
-===== Multi-threaded solution as single producer and many consumers without locks
+<details open>
+<summary>Multi-threaded solution as single producer and many consumers without locks</summary>
 
+```
 BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time           6936 ms        13871 ms
 BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time           6529 ms        13056 ms
 BM_MTLockFree<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time           6543 ms        13085 ms
@@ -254,9 +268,13 @@ BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_
 BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time          2557 ms         9515 ms
 BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time           2224 ms        15984 ms
 BM_MTLockFree<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time          2215 ms        15961 ms
+```
+</details>
 
-===== Multi-threaded solution as single producer and many consumers with semaphores (since C++20)
+<details open>
+<summary>Multi-threaded solution as single producer and many consumers with semaphores (since C++20)</summary>
 
+```
 BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:16/process_time/real_time                8737 ms        17373 ms
 BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:2/threads:2/mlines:96/process_time/real_time                7282 ms        13079 ms
 BM_MTSem<FGetsReader, MyWildcardMatch>/qsize:8/threads:2/mlines:96/process_time/real_time                7209 ms        12994 ms
@@ -302,9 +320,10 @@ BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:4/mlines:256/process_time/
 BM_MTSem<MMapReader, MyWildcardMatch>/qsize:16/threads:4/mlines:256/process_time/real_time               2671 ms         9032 ms
 BM_MTSem<MMapReader, MyWildcardMatch>/qsize:8/threads:8/mlines:256/process_time/real_time                2218 ms        15257 ms
 BM_MTSem<MMapReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time               2225 ms        15445 ms
-
 ```
+</details>
 
+#### Output description
 - BM_Sequential   - Single-threaded implementation
 - BM_MTCondVar    - Multi-threaded implementation as a Producer-Consumer solution using
                     mutex and condition variables.
