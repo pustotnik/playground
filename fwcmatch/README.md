@@ -446,14 +446,16 @@ As I understand the mmap is a good method to read the same file several times an
 for a random access (especially on SSD).
 Also I can recommend to read [this](https://sasha-f.medium.com/why-mmap-is-faster-than-system-calls-24718e75ab37).
 
-## About wait-free/busy-waiting solution
-In this solution I used wait-free and lock free implementation of
-ring buffer from https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular.
+## About busy-waiting solutions with atomic
+In this solution I used implementation of
+ring buffer from [here](https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular) in the first variant.
 This container is thread-safe but only for single producer and single consumer variant.
 So I implemented this as a group of pairs "single producer -> single consumer" where
 my single producer emulates many producers in a loop. In some cases this solution showed better
 performance than solution with conditional variables but not always.
-The main problem with this is busy-waiting on CPU when these queues are full or empty.
+The second variant uses MPMCQueue from [here](https://github.com/rigtorp/MPMCQueue) and has very similar
+performance with the first variant.
+The main problem with both variants is busy-waiting on CPU when these queues are full or empty.
 Look at the column "CPU" to see the proof. And if you set number of threads
 more than necessery for optimal processing then a lot of time this code will
 just "burn" CPU cores what is not good at all. But such a way can help in some cases and
