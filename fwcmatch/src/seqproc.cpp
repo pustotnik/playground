@@ -10,7 +10,7 @@ using namespace std;
 
 static constexpr size_t BLOCK_SIZE = 4*1024;
 
-SequentialProcessor::SequentialProcessor(const size_t maxLines):
+SequentialProcessor::SequentialProcessor(size_t maxLines):
     _maxLines(maxLines) {
 
     assert(_maxLines > 0);

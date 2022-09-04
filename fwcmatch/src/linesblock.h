@@ -19,8 +19,7 @@ public:
     //constexpr static size_t DEFAULT_BLOCK_SIZE = 4*1024;
     constexpr static size_t DEFAULT_BLOCK_SIZE = 2*1024;
 
-    explicit BlocksBuffer(const size_t size = 0,
-                            const size_t blockSize = DEFAULT_BLOCK_SIZE):
+    explicit BlocksBuffer(size_t size = 0, size_t blockSize = DEFAULT_BLOCK_SIZE):
         _blockSize(blockSize) {
 
         if(size) {
@@ -33,7 +32,7 @@ public:
 
     // resize buffer
     // there is no real memory allocation if capacity() returns enough big size
-    void resize(const size_t numOfBlocks, const size_t blockSize = DEFAULT_BLOCK_SIZE) {
+    void resize(size_t numOfBlocks, size_t blockSize = DEFAULT_BLOCK_SIZE) {
         assert(blockSize > 0);
         _blockSize = blockSize;
         _buffer.resize(_blockSize * numOfBlocks);
@@ -149,8 +148,8 @@ using LinesBlockPtr = LinesBlock*;
 class LinesBlockPool final {
 public:
 
-    LinesBlockPool(const size_t numOfBlocks, const size_t maxLines,
-                            const size_t blockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE):
+    LinesBlockPool(size_t numOfBlocks, size_t maxLines,
+                            size_t blockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE):
         _freeBlocks(numOfBlocks), _maxLines(maxLines), _blockSize(blockSize) {
 
         assert(numOfBlocks > 0);
@@ -166,7 +165,7 @@ public:
     }
 
     // init/reset blocks
-    void reset(const bool allocBuffers) {
+    void reset(bool allocBuffers) {
 
         // reset all pointers of free blocks
         _freeBlocks.reset();

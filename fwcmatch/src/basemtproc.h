@@ -32,7 +32,7 @@ protected:
                                                         LinesBlock const& block);
 
     void initLinesBlock(LinesBlock& block,
-                    const size_t blockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE);
+                    size_t blockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE);
 
     std::vector<size_t> _counters;
     const size_t        _numOfConsThreads;
@@ -93,7 +93,7 @@ inline size_t BaseMTProcessor::filterBlock(WildcardMatch& wcmatch,
     return counter;
 }
 
-inline void BaseMTProcessor::initLinesBlock(LinesBlock& block, const size_t blockSize) {
+inline void BaseMTProcessor::initLinesBlock(LinesBlock& block, size_t blockSize) {
     block.lines.reserve(_maxLines);
     if(_needsBuffer) {
         block.buffer.resize(_maxLines, blockSize);
