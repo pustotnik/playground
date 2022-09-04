@@ -31,9 +31,6 @@ protected:
     size_t filterBlock(WildcardMatch& wcmatch, const std::string& pattern,
                                                         LinesBlock const& block);
 
-    void initLinesBlock(LinesBlock& block,
-                    size_t blockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE);
-
     std::vector<size_t> _counters;
     const size_t        _numOfConsThreads;
     const size_t        _maxLines;
@@ -59,12 +56,11 @@ inline void BaseMTProcessor::readInLinesBlock(FileReader& freader, LinesBlock& b
 
     const bool needsBuffer = freader.needsBuffer();
 
-    auto& lines  = block.lines;
-    auto& buffer = block.buffer;
+    auto& buffer = block.buffer();
     auto* bufferPtr = needsBuffer ? buffer.get(0) : nullptr;
     size_t lastLineSize = 0;
 
-    lines.clear();
+    block.clear();
     for(size_t i = 0; i < _maxLines; ++i) {
         if(needsBuffer) {
             //freader.setBuffer(buffer.get(i), buffer.blockSize());
@@ -78,26 +74,19 @@ inline void BaseMTProcessor::readInLinesBlock(FileReader& freader, LinesBlock& b
             break;
         }
         lastLineSize = line.size();
-        lines.push_back(std::move(line));
+        block.addLine(std::move(line));
     }
 }
 
 inline size_t BaseMTProcessor::filterBlock(WildcardMatch& wcmatch,
                                     const std::string& pattern, LinesBlock const& block) {
 
-    auto& lines = block.lines;
+    auto const& lines = block.lines();
     size_t counter = count_if(lines.cbegin(), lines.cend(),
         [&](auto const& line){ return wcmatch.isMatch(line, pattern); }
     );
 
     return counter;
-}
-
-inline void BaseMTProcessor::initLinesBlock(LinesBlock& block, size_t blockSize) {
-    block.lines.reserve(_maxLines);
-    if(_needsBuffer) {
-        block.buffer.resize(_maxLines, blockSize);
-    }
 }
 
 inline size_t BaseMTProcessor::calcFinalResult() const {

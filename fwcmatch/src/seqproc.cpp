@@ -10,26 +10,24 @@ using namespace std;
 
 static constexpr size_t BLOCK_SIZE = 4*1024;
 
-SequentialProcessor::SequentialProcessor(size_t maxLines):
+SequentialProcessor::SequentialProcessor(size_t maxLines, bool needsBuffer):
     _maxLines(maxLines) {
 
     assert(_maxLines > 0);
-    _linesBlock.buffer.resize(maxLines, BLOCK_SIZE);
-    _linesBlock.lines.reserve(_maxLines);
+    _linesBlock.alloc(maxLines, needsBuffer, BLOCK_SIZE);
 }
 
 size_t SequentialProcessor::execute(FileReader& freader, const string& filename,
                             WildcardMatch& wcmatch, const string& pattern) {
 
     const bool needsBuffer = freader.needsBuffer();
-    auto& buffer = _linesBlock.buffer;
-    auto& flines = _linesBlock.lines;
+    auto& buffer = _linesBlock.buffer();
 
     ScopedFileOpener fopener(freader, filename);
 
     size_t i, result = 0;
     for(;;) {
-        flines.clear();
+        _linesBlock.clear();
         for(i = 0; i < _maxLines; ++i) {
             if(needsBuffer) {
                 freader.setBuffer(buffer.get(i), buffer.blockSize());
@@ -38,9 +36,10 @@ size_t SequentialProcessor::execute(FileReader& freader, const string& filename,
             if(!line.data()) {
                 break;
             }
-            flines.emplace_back(std::move(line));
+            _linesBlock.addLine(std::move(line));
         }
 
+        auto const& flines = _linesBlock.lines();
         if(flines.empty()) {
             break;
         }

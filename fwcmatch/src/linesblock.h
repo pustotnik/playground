@@ -16,24 +16,21 @@ public:
     using Pointer      = char*;
     using ConstPointer = char const*;
 
-    //constexpr static size_t DEFAULT_BLOCK_SIZE = 4*1024;
     constexpr static size_t DEFAULT_BLOCK_SIZE = 2*1024;
 
-    explicit BlocksBuffer(size_t size = 0, size_t blockSize = DEFAULT_BLOCK_SIZE):
-        _blockSize(blockSize) {
+    BlocksBuffer() noexcept = default;
 
-        if(size) {
-            resize(size, blockSize);
-        }
+    explicit BlocksBuffer(size_t size, size_t blockSize = DEFAULT_BLOCK_SIZE) {
+        resize(size, blockSize);
     }
 
     BlocksBuffer(BlocksBuffer&& other) noexcept = default;
     BlocksBuffer& operator=(BlocksBuffer&& other) noexcept = default;
 
-    // resize buffer
+    // resize buffer,
     // there is no real memory allocation if capacity() returns enough big size
     void resize(size_t numOfBlocks, size_t blockSize = DEFAULT_BLOCK_SIZE) {
-        assert(blockSize > 0);
+        assert(0 == numOfBlocks || (numOfBlocks > 0 && blockSize > 0));
         _blockSize = blockSize;
         _buffer.resize(_blockSize * numOfBlocks);
     }
@@ -46,34 +43,49 @@ public:
     void clear() noexcept { _buffer.clear(); }
 
     // get current buffer size
+    [[nodiscard]]
     size_t size() const noexcept { return _buffer.size(); }
 
     // get capacity of buffer
+    [[nodiscard]]
     size_t capacity() const noexcept { return _buffer.capacity(); }
 
+    [[nodiscard]]
     bool empty() const noexcept { return _buffer.empty(); }
 
     // get size of block
+    [[nodiscard]]
     size_t blockSize() const noexcept { return _blockSize; }
 
     // get number of blocks
+    [[nodiscard]]
     size_t numOfBlocks() const noexcept { return size() / _blockSize; }
 
     // get block by index
+    [[nodiscard]]
     Pointer get(size_t idx) {
         assert(idx * _blockSize < _buffer.size());
         return _buffer.data() + idx * _blockSize;
     }
 
     // get block by index
+    [[nodiscard]]
     ConstPointer get(size_t idx) const {
         assert(idx * _blockSize < _buffer.size());
         return _buffer.data() + idx * _blockSize;
     }
 
+    // check if a pointer belongs to this buffer
+    [[nodiscard]]
+    bool owns(ConstPointer p) const noexcept {
+        ConstPointer begin = _buffer.data();
+        ConstPointer end   = begin + _buffer.size();
+        return p >= begin && p < end;
+    }
+
 private:
     std::vector<char> _buffer;
-    size_t            _blockSize;
+    size_t            _blockSize { 0 };
 };
 
 static_assert(std::is_move_constructible_v<BlocksBuffer>);
@@ -84,28 +96,32 @@ static_assert( ! std::is_copy_assignable_v<BlocksBuffer>);
 using FileLineRef  = std::string_view;
 using FileLineRefs = std::vector<FileLineRef>;
 
-// Simplified structure for effective storage of blocks of file lines
-struct LinesBlock {
-    BlocksBuffer buffer;
-    FileLineRefs lines;
+// Simplified class for effective storage of blocks of file lines
+class LinesBlock final {
+public:
 
-    LinesBlock() = default;
+    LinesBlock() noexcept = default;
+
+    LinesBlock(size_t maxLines, bool withBuffer,
+                    size_t bufferBlockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE) {
+        alloc(maxLines, withBuffer, bufferBlockSize);
+    }
 
     LinesBlock& operator=(const LinesBlock& other) {
 
-        if(other.buffer.empty()) {
-            lines = other.lines;
-            buffer.clear();
+        if(other._buffer.empty()) {
+            _lines = other._lines;
+            _buffer.clear();
             return *this;
         }
 
-        if(buffer.size() != other.buffer.size()) {
+        if(_buffer.size() != other._buffer.size()) {
 
-            if(buffer.capacity() >= other.buffer.size()) {
+            if(_buffer.capacity() >= other._buffer.size()) {
                 // there is no real memory allocation here
-                buffer.resize(other.buffer.numOfBlocks(), other.buffer.blockSize());
-                assert(buffer.blockSize() == other.buffer.blockSize());
-                assert(buffer.size() == other.buffer.size());
+                _buffer.resize(other._buffer.numOfBlocks(), other._buffer.blockSize());
+                assert(_buffer.blockSize() == other._buffer.blockSize());
+                assert(_buffer.size() == other._buffer.size());
             }
             else {
                 throw std::logic_error(
@@ -113,28 +129,75 @@ struct LinesBlock {
             }
         }
 
-        lines.clear();
-        for(size_t i = 0; i < other.lines.size(); ++i) {
-            auto& othrline = other.lines[i];
-            auto* buff     = buffer.get(i);
+        _lines.clear();
+        for(size_t i = 0; i < other._lines.size(); ++i) {
+            auto& othrline = other._lines[i];
+            auto* buff     = _buffer.get(i);
 
-            assert(othrline.cbegin() >= other.buffer.get(i));
-            assert(othrline.cend() < other.buffer.get(i) + other.buffer.blockSize());
+            assert(othrline.cbegin() >= other._buffer.get(i));
+            assert(othrline.cend() < other._buffer.get(i) + other._buffer.blockSize());
 
             std::memcpy(buff, othrline.cbegin(), othrline.size());
-            lines.emplace_back( buff, othrline.size() );
+            _lines.emplace_back(buff, othrline.size());
         }
 
         return *this;
     }
 
-    void swap(LinesBlock& other) noexcept {
-        buffer.swap(other.buffer);
-        lines.swap(other.lines);
-    }
-
     LinesBlock(LinesBlock&&) noexcept = default;
     LinesBlock& operator=(LinesBlock&& other) noexcept = default;
+
+    void swap(LinesBlock& other) noexcept {
+        _buffer.swap(other._buffer);
+        _lines.swap(other._lines);
+    }
+
+    void alloc(size_t maxLines, bool withBuffer,
+                    size_t bufferBlockSize = BlocksBuffer::DEFAULT_BLOCK_SIZE) {
+        _lines.reserve(maxLines);
+        if(withBuffer) {
+            _buffer.resize(maxLines, bufferBlockSize);
+        }
+    }
+
+    void addLine(const FileLineRef& line) {
+        assert(checkLine(line));
+        _lines.push_back(line);
+    }
+
+    void addLine(FileLineRef&& line) {
+        assert(checkLine(line));
+        _lines.push_back(std::move(line));
+    }
+
+    // clear lines, it does not deallocate memory
+    void clear() noexcept {
+        _lines.clear();
+    }
+
+    [[nodiscard]]
+    const FileLineRefs& lines() const noexcept { return _lines; }
+
+    [[nodiscard]]
+    const BlocksBuffer& buffer() const noexcept { return _buffer; }
+
+    [[nodiscard]]
+    BlocksBuffer& buffer() noexcept { return _buffer; }
+
+private:
+    BlocksBuffer _buffer;
+    FileLineRefs _lines;
+
+    [[nodiscard]]
+    bool checkLine(const FileLineRef& line) const noexcept {
+        if(_buffer.empty() || line.empty()) {
+            return true;
+        }
+
+        auto* begin = line.data();
+        auto* last = begin + line.size() - 1;
+        return _buffer.owns(begin) && _buffer.owns(last);
+    }
 };
 
 static_assert(std::is_move_constructible_v<LinesBlock>);
@@ -158,9 +221,7 @@ public:
 
         _blocks.reserve(numOfBlocks);
         for(size_t i = 0; i < numOfBlocks; ++i) {
-            LinesBlock blk;
-            blk.lines.reserve(maxLines);
-            _blocks.push_back(std::move(blk));
+            _blocks.emplace_back(maxLines, false);
         }
     }
 
@@ -171,13 +232,12 @@ public:
         _freeBlocks.reset();
         for(auto& block: _blocks) {
             _freeBlocks.push(&block);
-            if(allocBuffers) {
-                block.buffer.resize(_maxLines, _blockSize);
-            }
+            block.alloc(_maxLines, allocBuffers, _blockSize);
         }
     }
 
     // allocate block, there is no memory allocation
+    [[nodiscard]]
     LinesBlockPtr allocBlock() {
         if(_freeBlocks.empty()) {
             return nullptr;
@@ -193,12 +253,7 @@ public:
         _freeBlocks.push(p);
     }
 
-    // get size of block
-    size_t blockSize() const noexcept { return _blockSize; }
-
-    // get max number of lines
-    size_t maxLines() const noexcept { return _maxLines; }
-
+    [[nodiscard]]
     size_t capacity() const noexcept { return _blocks.capacity(); }
 
 private:

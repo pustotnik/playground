@@ -13,15 +13,15 @@ MTCondVarProcessor2::MTCondVarProcessor2(size_t queueSize, size_t numOfConsThrea
 
     assert(queueSize > 0);
 
-    _blocksQueue.apply([&](LinesBlock& block) { initLinesBlock(block); });
+    _blocksQueue.apply([&](LinesBlock& block) {
+        block.alloc(maxLines, needsBuffer);
+    });
 
     auto numOfThreads = numOfConsThreads + 1;
     _localBlocks.reserve(numOfThreads);
     for(size_t i = 0; i < numOfThreads; ++i) {
         // these blocks are used only when needsBuffer == false
-        LinesBlock block;
-        block.lines.reserve(maxLines);
-        _localBlocks.push_back(std::move(block));
+        _localBlocks.emplace_back(maxLines, false);
     }
 }
 
@@ -50,7 +50,7 @@ void MTCondVarProcessor2::readFileLines(FileReader& freader) {
             lock.unlock();
 
             readInLinesBlock(freader, *block);
-            if(block->lines.empty()) {
+            if(block->lines().empty()) {
                 break;
             }
 
@@ -63,7 +63,7 @@ void MTCondVarProcessor2::readFileLines(FileReader& freader) {
         auto& block = _localBlocks[0];
         for(;;) {
             readInLinesBlock(freader, block);
-            if(block.lines.empty()) {
+            if(block.lines().empty()) {
                 break;
             }
 

@@ -13,14 +13,14 @@ MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads
 
     assert(queueSize > 0);
 
-    _blocksQueue.apply([&](LinesBlock& block) { initLinesBlock(block); } );
+    _blocksQueue.apply([&](LinesBlock& block) {
+        block.alloc(maxLines, needsBuffer);
+    });
 
     auto numOfThreads = numOfConsThreads + 1;
     _firstBlocks.reserve(numOfThreads);
     for(size_t i = 0; i < numOfThreads; ++i) {
-        LinesBlock block;
-        initLinesBlock(block);
-        _firstBlocks.push_back(std::move(block));
+        _firstBlocks.emplace_back(maxLines, needsBuffer);
     }
 }
 
@@ -59,7 +59,7 @@ void MTCondVarProcessor::readFileLines(FileReader& freader) {
     for(;;) {
 
         readInLinesBlock(freader, block);
-        if(block.lines.empty()) {
+        if(block.lines().empty()) {
             // end of file
             break;
         }

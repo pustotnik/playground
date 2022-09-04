@@ -49,7 +49,7 @@ void MPMCProcessor::readFileLines(FileReader& freader) {
 
         assert(block);
         readInLinesBlock(freader, *block);
-        if(block->lines.empty()) {
+        if(block->lines().empty()) {
             // end of file
 
             // use terminal block in the queue as a signal to stop consumers

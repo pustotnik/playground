@@ -31,7 +31,7 @@ void BM_Sequential(benchmark::State& state) {
 
     auto freader   = FReader();
     auto wcmatch   = WildcardMatch();
-    auto processor = SequentialProcessor(maxLines);
+    auto processor = SequentialProcessor(maxLines, freader.needsBuffer());
 
     size_t found = 0;
     for (auto _ : state) {

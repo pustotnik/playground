@@ -16,7 +16,7 @@ MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThrea
     for(size_t i = 0; i < numOfConsThreads; ++i) {
         auto cinfo = make_unique<ConsumerInfo>(queueSize);
         cinfo->blocksQueue.apply([&](LinesBlock& block) {
-            initLinesBlock(block);
+            block.alloc(maxLines, needsBuffer);
         });
         _consThreadInfo.push_back(std::move(cinfo));
     }
@@ -42,7 +42,7 @@ void MTLockFreeProcessor::readFileLines(FileReader& freader) {
     bool noData = false;
     auto readBlock = [&](LinesBlock& block) {
         readInLinesBlock(freader, block);
-        noData = block.lines.empty();
+        noData = block.lines().empty();
     };
 
     for(;;) {
