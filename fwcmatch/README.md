@@ -490,7 +490,8 @@ and you can find a lot of variants on the internet how to implement such a thing
 (from std::atomic_flag for example) but I'm not sure that they all work properly.
 Also I can recommend to read this: https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723
 Nevertheless as I know modern implementations of std::mutex already use similar
-thing inside for a short waitings and I think this is enough already.
+thing inside for a short waitings and I think this can be enough already.
+But it depends on implementation and hardware.
 
 ## Memory locality
 This can improve performance but you must be accurate in
