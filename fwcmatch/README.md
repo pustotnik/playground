@@ -43,8 +43,9 @@ cmake --build build
 BENCH_FILENAME="/files/tmp/unison.log" BENCH_PATTERN="*failed*" ./build/fwcmatch-bench
 ```
 
-Build dependencies:
-- [Google Benchmark](https://github.com/google/benchmark) (dev-cpp/benchmark in Gentoo)
+Build and runtime dependencies:
+- [Google Benchmark](https://github.com/google/benchmark)
+  (dev-cpp/benchmark in Gentoo, version 1.6.1 was used)
 
 ## The results
 <details open>
@@ -412,8 +413,9 @@ On different OS/hardware/implementation the results can be different.
   one at one time for single-threaded implementation.
   But it is important for multi-threaded implementation.
 - Increasing number of threads in multi-threaded implementation is not always
-  optimal decision. But it is because file I/O is bottleneck for this task.
-- Lock-free/busy-waiting solution is not the best choice for a common case.
+  optimal decision. But it is because file I/O is bottleneck for this task
+  and it can increase thread contention.
+- Lock-free/busy-waiting solution is not always the best choice.
 - MTSem (semaphores) is similar to the MTCondVar (condition variables)
   in terms of performance but the MTCondVar is a little bit better.
 - Memory/data locality is important for general performance.
@@ -461,6 +463,26 @@ more than necessery for optimal processing then a lot of time this code will
 just "burn" CPU cores what is not good at all. But such a way can help in some cases and
 with law latency for example.
 So be careful with such busy-waiting solutions. You should understand what you are doing.
+
+UPD. With MPMCQueue (BM_MTMPMC) I got a really huge regression on 16 threads:
+
+```
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time        4430 ms        35284 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:32/threads:16/mlines:96/process_time/real_time      352768 ms      2801674 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:128/threads:16/mlines:96/process_time/real_time      99997 ms       793749 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:8/threads:16/mlines:256/process_time/real_time      393153 ms      3126706 ms
+BM_MTMPMC<FStreamReader, MyWildcardMatch>/qsize:16/threads:16/mlines:256/process_time/real_time     228647 ms      1812834 ms
+```
+
+BM_MTLockFree also showed regression but not so huge:
+
+```
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:16/threads:8/mlines:256/process_time/real_time        4235 ms        33703 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:32/threads:16/mlines:96/process_time/real_time        9522 ms        75648 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:128/threads:16/mlines:96/process_time/real_time      11146 ms        87174 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:8/threads:16/mlines:256/process_time/real_time       11697 ms        89964 ms
+BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:16/threads:16/mlines:256/process_time/real_time       9169 ms        72299 ms
+```
 
 ## About spinlocks
 I used spinlocks a lot in the past (as the spin_mutex from Intel TBB)
