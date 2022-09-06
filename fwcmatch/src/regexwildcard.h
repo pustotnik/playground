@@ -4,17 +4,15 @@
 
 #include "wildcard.h"
 
-// this implemenation is not thread safe
-
 class REMatch final: public WildcardMatch
 {
 public:
     bool isMatch(const std::string_view& text, const std::string& pattern) const override;
 
 private:
-    mutable std::string _pattern;
-    mutable std::regex  _regex;
-    mutable std::cmatch _matchResults;
+    // used as a simple thread safe cache
+    thread_local static std::string _pattern;
+    thread_local static std::regex  _regex;
 
-    void mkRegExPattern(const std::string& pattern) const;
+    static void mkRegExPattern(const std::string& pattern);
 };

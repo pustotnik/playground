@@ -27,15 +27,8 @@ static const vector<pair<string, string>> RE_REPLACE = {
     { "?", "." },
 };
 
-bool REMatch::isMatch(const string_view& text, const string& pattern) const {
-
-    if(text.empty() || pattern.empty()) {
-        return false;
-    }
-
-    mkRegExPattern(pattern);
-    return regex_match(text.cbegin(), text.cend(), _matchResults, _regex);
-}
+thread_local string REMatch::_pattern;
+thread_local regex REMatch::_regex;
 
 static void replaceAll(string& str, const string& from, const string& to) {
     string::size_type pos = 0;
@@ -45,7 +38,17 @@ static void replaceAll(string& str, const string& from, const string& to) {
     }
 }
 
-void REMatch::mkRegExPattern(const string& pattern) const {
+bool REMatch::isMatch(const string_view& text, const string& pattern) const {
+
+    if(text.empty() || pattern.empty()) {
+        return false;
+    }
+
+    mkRegExPattern(pattern);
+    return regex_match(text.cbegin(), text.cend(), _regex);
+}
+
+void REMatch::mkRegExPattern(const string& pattern) {
     if(pattern == _pattern) {
         return;
     }

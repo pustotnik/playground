@@ -2,6 +2,7 @@
 
 #include "wildcard.h"
 
+// Thread safe
 class MyWildcardMatch final: public WildcardMatch
 {
 public:

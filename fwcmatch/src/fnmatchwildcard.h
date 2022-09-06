@@ -2,6 +2,7 @@
 
 #include "wildcard.h"
 
+// Thread safe
 class FNMatch final: public WildcardMatch
 {
 public:
