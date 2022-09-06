@@ -10,6 +10,8 @@
 
 #include "ringbuffer.h"
 
+namespace fwc {
+
 // Simple buffer for data blocks
 class BlocksBuffer final {
 public:
@@ -158,6 +160,7 @@ public:
         if(withBuffer) {
             _buffer.resize(maxLines, bufferBlockSize);
         }
+        _maxLines = maxLines;
     }
 
     void addLine(const FileLineRef& line) {
@@ -179,6 +182,9 @@ public:
     const FileLineRefs& lines() const noexcept { return _lines; }
 
     [[nodiscard]]
+    size_t maxLines() const noexcept { return _maxLines; };
+
+    [[nodiscard]]
     const BlocksBuffer& buffer() const noexcept { return _buffer; }
 
     [[nodiscard]]
@@ -187,6 +193,7 @@ public:
 private:
     BlocksBuffer _buffer;
     FileLineRefs _lines;
+    size_t       _maxLines { 0 };
 
     [[nodiscard]]
     bool checkLine(const FileLineRef& line) const noexcept {
@@ -265,3 +272,5 @@ private:
     const size_t   _maxLines;
     const size_t   _blockSize;
 };
+
+} // namespace fwc

@@ -3,6 +3,8 @@
 
 #include "fnmatchwildcard.h"
 
+namespace fwc {
+
 thread_local std::string FNMatch::_text;
 
 bool FNMatch::isMatch(const std::string_view& text, const std::string& pattern) const {
@@ -18,3 +20,5 @@ bool FNMatch::isMatch(const std::string_view& text, const std::string& pattern) 
 
     return 0 == fnmatch(pattern.c_str(), _text.c_str(), FNM_NOESCAPE);
 }
+
+} // namespace fwc

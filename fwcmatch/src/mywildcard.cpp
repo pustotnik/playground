@@ -1,6 +1,8 @@
 
 #include "mywildcard.h"
 
+namespace fwc {
+
 bool MyWildcardMatch::isMatch(const std::string_view& text, const std::string& pattern) const {
 
     if(text.empty() || pattern.empty()) {
@@ -53,3 +55,5 @@ bool MyWildcardMatch::isMatch(const std::string_view& text, const std::string& p
     // Return true if we went through the whole pattern.
     return !*ppattern;
 }
+
+} // namespace fwc

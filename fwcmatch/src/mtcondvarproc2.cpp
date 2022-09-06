@@ -1,15 +1,17 @@
 
 #include <cassert>
 
-#include "mtcondvarproc2.h"
 #include "utils.h"
+#include "proctools.h"
+#include "mtcondvarproc2.h"
 
-using namespace std;
+namespace fwc {
 
 MTCondVarProcessor2::MTCondVarProcessor2(size_t queueSize, size_t numOfConsThreads,
                                         size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer),
-    _blocksQueue(queueSize, numOfConsThreads) {
+    BaseProdConsProcessor(numOfConsThreads),
+    _blocksQueue(queueSize, numOfConsThreads),
+    _needsBuffer(needsBuffer) {
 
     assert(queueSize > 0);
 
@@ -43,13 +45,13 @@ void MTCondVarProcessor2::readFileLines(FileReader& freader) {
         LinesBlockPtr block = nullptr;
         for(;;) {
 
-            unique_lock<mutex> lock(_queueMutex);
+            std::unique_lock<std::mutex> lock(_queueMutex);
             waitIfFull(lock);
 
             block = _blocksQueue.enqueuePrepare();
             lock.unlock();
 
-            readInLinesBlock(freader, *block);
+            proctools::readInLinesBlock(freader, *block);
             if(block->lines().empty()) {
                 break;
             }
@@ -62,12 +64,12 @@ void MTCondVarProcessor2::readFileLines(FileReader& freader) {
     else {
         auto& block = _localBlocks[0];
         for(;;) {
-            readInLinesBlock(freader, block);
+            proctools::readInLinesBlock(freader, block);
             if(block.lines().empty()) {
                 break;
             }
 
-            unique_lock<mutex> lock(_queueMutex);
+            std::unique_lock<std::mutex> lock(_queueMutex);
             waitIfFull(lock);
 
             *_blocksQueue.enqueuePrepare() = block;
@@ -76,13 +78,13 @@ void MTCondVarProcessor2::readFileLines(FileReader& freader) {
         }
     }
 
-    scoped_lock lock(_queueMutex);
+    std::scoped_lock lock(_queueMutex);
     _stop = true;
     _cvNonEmpty.notify_all();
 }
 
 void MTCondVarProcessor2::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, const string& pattern) {
+                            WildcardMatch& wcmatch, const std::string& pattern) {
 
     size_t counter = 0;
     LinesBlockPtr block = nullptr;
@@ -90,7 +92,7 @@ void MTCondVarProcessor2::filterLines(size_t idx,
 
     for(;;) {
 
-        unique_lock<mutex> lock(_queueMutex);
+        std::unique_lock<std::mutex> lock(_queueMutex);
         if(_blocksQueue.empty()) {
             _cvNonEmpty.wait(lock, [&](){ return !_blocksQueue.empty() || _stop; });
             if(_stop) {
@@ -102,7 +104,7 @@ void MTCondVarProcessor2::filterLines(size_t idx,
         if(_needsBuffer) {
             lock.unlock();
 
-            counter += filterBlock(wcmatch, pattern, *block);
+            counter += proctools::filterBlock(wcmatch, pattern, *block);
 
             lock.lock();
             _blocksQueue.dequeueCommit(idx);
@@ -119,9 +121,11 @@ void MTCondVarProcessor2::filterLines(size_t idx,
             }
             lock.unlock();
 
-            counter += filterBlock(wcmatch, pattern, blockCopy);
+            counter += proctools::filterBlock(wcmatch, pattern, blockCopy);
         }
     }
 
     _counters[idx] = counter;
 }
+
+} // namespace fwc

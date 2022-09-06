@@ -1,13 +1,18 @@
 
 #include <regex>
+#include <string_view>
 #include <vector>
 #include <utility>
 
 #include "regexwildcard.h"
 
-using namespace std;
+namespace fwc {
 
-static const vector<pair<string, string>> RE_REPLACE = {
+using string      = std::string;
+using string_view = std::string_view;
+using regex       = std::regex;
+
+static const std::vector<std::pair<string, string>> RE_REPLACE = {
 
     { "\\", "\\\\" },
     { "^", "\\^" },
@@ -64,3 +69,5 @@ void REMatch::mkRegExPattern(const string& pattern) {
     constexpr regex::flag_type flags = regex::ECMAScript;
     _regex.assign(repattern, flags);
 }
+
+} // namespace fwc

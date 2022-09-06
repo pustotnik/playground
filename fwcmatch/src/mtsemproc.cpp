@@ -1,16 +1,17 @@
 
 #include <cassert>
 
+#include "proctools.h"
 #include "mtsemproc.h"
 
-using namespace std;
+namespace fwc {
 
 // special pointer to send as a terminal block
 static LinesBlockPtr TERM_BLOCK = reinterpret_cast<LinesBlockPtr>(-1);
 
 MTSemProcessor::MTSemProcessor(size_t queueSize, size_t numOfConsThreads,
                                             size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer),
+    BaseProdConsProcessor(numOfConsThreads),
     // for each block in queue and for each thread for waiting
     _blocksPool(queueSize + numOfConsThreads + 1, maxLines),
     _blocksQueue(queueSize) {
@@ -39,8 +40,8 @@ void MTSemProcessor::init() {
     _blocksQueue.reset();
 
     // I didn't find any other way to reset std::counting_semaphore objects
-    _semEmpty = make_unique<Semaphore>(_blocksQueue.capacity());
-    _semFull  = make_unique<Semaphore>(0);
+    _semEmpty = std::make_unique<Semaphore>(_blocksQueue.capacity());
+    _semFull  = std::make_unique<Semaphore>(0);
 }
 
 void MTSemProcessor::readFileLines(FileReader& freader) {
@@ -51,7 +52,7 @@ void MTSemProcessor::readFileLines(FileReader& freader) {
     for(;;) {
 
         assert(block);
-        readInLinesBlock(freader, *block);
+        proctools::readInLinesBlock(freader, *block);
         if(block->lines().empty()) {
             // end of file
 
@@ -62,7 +63,7 @@ void MTSemProcessor::readFileLines(FileReader& freader) {
 
         _semEmpty->acquire();
         {
-            scoped_lock lock(_queueMutex);
+            std::scoped_lock lock(_queueMutex);
             _blocksQueue.pushSwapping(block);
         }
         _semFull->release();
@@ -75,7 +76,7 @@ void MTSemProcessor::readFileLines(FileReader& freader) {
 }
 
 void MTSemProcessor::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, const string& pattern) {
+                            WildcardMatch& wcmatch, const std::string& pattern) {
 
     size_t counter = 0;
     LinesBlockPtr block = _firstBlocks[idx + 1];
@@ -88,7 +89,7 @@ void MTSemProcessor::filterLines(size_t idx,
         _semFull->acquire();
 
         {
-            scoped_lock lock(_queueMutex);
+            std::scoped_lock lock(_queueMutex);
             last = (TERM_BLOCK == _blocksQueue.top());
             if(!last) {
                 std::swap(block, _blocksQueue.top());
@@ -107,8 +108,10 @@ void MTSemProcessor::filterLines(size_t idx,
         }
 
         assert(block);
-        counter += filterBlock(wcmatch, pattern, *block);
+        counter += proctools::filterBlock(wcmatch, pattern, *block);
     }
 
     _counters[idx] = counter;
 }
+
+} // namespace fwc

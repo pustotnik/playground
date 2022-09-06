@@ -6,7 +6,9 @@
 #include <mutex>
 #include <condition_variable>
 
-#include "basemtproc.h"
+#include "basepcproc.h"
+
+namespace fwc {
 
 /*
 This class implements strategy of solving the problem with mutexes and
@@ -14,7 +16,7 @@ condition variables. There is no memory reallocation during processing and
 it uses ring buffer for the queue of data between producer and consumers.
 */
 
-class MTCondVarProcessor final: public BaseMTProcessor
+class MTCondVarProcessor final: public BaseProdConsProcessor
 {
 public:
     MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads,
@@ -37,3 +39,5 @@ private:
     std::condition_variable _cvNonFull;
     bool                    _stop        { false };
 };
+
+} // namespace fwc

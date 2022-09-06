@@ -2,19 +2,20 @@
 #include <cassert>
 #include <thread>
 
+#include "proctools.h"
 #include "mtlockfreeproc.h"
 
-using namespace std;
+namespace fwc {
 
 MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads,
                                         size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer) {
+    BaseProdConsProcessor(numOfConsThreads) {
 
     assert(queueSize > 0);
 
     _consThreadInfo.reserve(numOfConsThreads);
     for(size_t i = 0; i < numOfConsThreads; ++i) {
-        auto cinfo = make_unique<ConsumerInfo>(queueSize);
+        auto cinfo = std::make_unique<ConsumerInfo>(queueSize);
         cinfo->blocksQueue.apply([&](LinesBlock& block) {
             block.alloc(maxLines, needsBuffer);
         });
@@ -24,7 +25,7 @@ MTLockFreeProcessor::MTLockFreeProcessor(size_t queueSize, size_t numOfConsThrea
 
 void MTLockFreeProcessor::init() {
 
-    _stop.store(false, memory_order_release);
+    _stop.store(false, std::memory_order_release);
 
     for(auto& consInfo: _consThreadInfo) {
         consInfo->reset();
@@ -41,7 +42,7 @@ void MTLockFreeProcessor::readFileLines(FileReader& freader) {
 
     bool noData = false;
     auto readBlock = [&](LinesBlock& block) {
-        readInLinesBlock(freader, block);
+        proctools::readInLinesBlock(freader, block);
         noData = block.lines().empty();
     };
 
@@ -66,14 +67,14 @@ void MTLockFreeProcessor::readFileLines(FileReader& freader) {
 
         // usually it is useless function on a platform with more than one
         // CPU core but because of busy-waiting it helps to decrease CPU load
-        this_thread::yield();
+        std::this_thread::yield();
     }
 
-    _stop.store(true, memory_order_release);
+    _stop.store(true, std::memory_order_release);
 }
 
 void MTLockFreeProcessor::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, const string& pattern) {
+                            WildcardMatch& wcmatch, const std::string& pattern) {
 
     constexpr size_t maxSpins = 1000;
     auto& consInfo = *_consThreadInfo[idx];
@@ -81,7 +82,7 @@ void MTLockFreeProcessor::filterLines(size_t idx,
     size_t spinner = 0;
 
     auto handleBlock = [&](LinesBlock const& block) {
-        counter += filterBlock(wcmatch, pattern, block);
+        counter += proctools::filterBlock(wcmatch, pattern, block);
     };
 
     for(;;) {
@@ -90,7 +91,7 @@ void MTLockFreeProcessor::filterLines(size_t idx,
             continue;
         }
 
-        if(_stop.load(memory_order_acquire)) {
+        if(_stop.load(std::memory_order_acquire)) {
             break;
         }
 
@@ -98,7 +99,7 @@ void MTLockFreeProcessor::filterLines(size_t idx,
 
             // usually it is useless function on a platform with more than one
             // CPU core but because of busy-waiting it helps to decrease CPU load
-            this_thread::yield();
+            std::this_thread::yield();
             spinner = 0;
         }
 
@@ -107,3 +108,5 @@ void MTLockFreeProcessor::filterLines(size_t idx,
 
     consInfo.counter = counter;
 }
+
+} // namespace fwc

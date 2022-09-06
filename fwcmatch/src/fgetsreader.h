@@ -5,6 +5,8 @@
 
 #include "filereader.h"
 
+namespace fwc {
+
 class FGetsReader final: public FileReader
 {
 public:
@@ -26,3 +28,5 @@ public:
 private:
     FILE*  _file { nullptr };
 };
+
+} // namespace fwc

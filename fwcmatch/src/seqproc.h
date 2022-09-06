@@ -9,6 +9,8 @@
 #include "wildcard.h"
 #include "filereader.h"
 
+namespace fwc {
+
 class SequentialProcessor final: private noncopyable
 {
 public:
@@ -20,6 +22,7 @@ public:
 
 private:
 
-    const size_t _maxLines;
     LinesBlock   _linesBlock;
 };
+
+} // namespace fwc

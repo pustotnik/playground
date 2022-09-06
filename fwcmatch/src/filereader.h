@@ -6,6 +6,8 @@
 #include "noncopyable.h"
 #include "linesblock.h"
 
+namespace fwc {
+
 class FileReader: private noncopyable
 {
 public:
@@ -50,3 +52,5 @@ public:
 private:
     FileReader& _freader;
 };
+
+} // namespace fwc

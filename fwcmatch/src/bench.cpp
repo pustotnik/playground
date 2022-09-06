@@ -20,6 +20,7 @@
 #include "mtmpmcproc.h"
 
 using namespace std;
+using namespace fwc;
 
 static string benchFileName;
 static string benchPattern;
@@ -43,7 +44,11 @@ void BM_Sequential(benchmark::State& state) {
 }
 
 static void genSequentialArguments(benchmark::internal::Benchmark* b) {
-    b->Arg(1)->Arg(4)->Arg(16)->Arg(32)
+    b
+    ->Arg(1)
+    ->Arg(4)
+    ->Arg(16)
+    ->Arg(32)
     ->ArgNames({"mlines", })
     //->Iterations(2)
     ->Unit(benchmark::kMillisecond)

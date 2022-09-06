@@ -5,6 +5,8 @@
 #include <string>
 #include <iostream>
 
+namespace fwc {
+
 [[ noreturn ]]
 inline void errorAndStop(const std::string& msg, bool useErrno = true) {
     if(useErrno) {
@@ -15,3 +17,5 @@ inline void errorAndStop(const std::string& msg, bool useErrno = true) {
     }
     exit(255);
 }
+
+} // namespace fwc

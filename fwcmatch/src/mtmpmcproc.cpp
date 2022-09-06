@@ -1,16 +1,17 @@
 
 #include <cassert>
 
+#include "proctools.h"
 #include "mtmpmcproc.h"
 
-using namespace std;
+namespace fwc {
 
 // special pointer to send as a terminal block
 static LinesBlockPtr TERM_BLOCK = reinterpret_cast<LinesBlockPtr>(-1);
 
 MPMCProcessor::MPMCProcessor(size_t queueSize, size_t numOfConsThreads,
                                             size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer),
+    BaseProdConsProcessor(numOfConsThreads),
     // for each block in queue and for each thread for waiting
     _blocksPool(queueSize + numOfConsThreads + 1, maxLines),
     _blocksQueue(queueSize),
@@ -48,7 +49,7 @@ void MPMCProcessor::readFileLines(FileReader& freader) {
         _freeBlocks.pop(block);
 
         assert(block);
-        readInLinesBlock(freader, *block);
+        proctools::readInLinesBlock(freader, *block);
         if(block->lines().empty()) {
             // end of file
 
@@ -68,7 +69,7 @@ void MPMCProcessor::readFileLines(FileReader& freader) {
 }
 
 void MPMCProcessor::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, const string& pattern) {
+                            WildcardMatch& wcmatch, const std::string& pattern) {
 
     size_t counter = 0;
     LinesBlockPtr block = nullptr;
@@ -87,9 +88,11 @@ void MPMCProcessor::filterLines(size_t idx,
         }
 
         assert(block);
-        counter += filterBlock(wcmatch, pattern, *block);
+        counter += proctools::filterBlock(wcmatch, pattern, *block);
         _freeBlocks.push(block);
     }
 
     _counters[idx] = counter;
 }
+
+} // namespace fwc

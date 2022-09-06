@@ -7,6 +7,8 @@
 #include "utils.h"
 #include "fgetsreader.h"
 
+namespace fwc {
+
 FGetsReader::~FGetsReader() {
     close();
 }
@@ -64,3 +66,5 @@ FileLineRef FGetsReader::readLine() {
 
     return { _buffer, lineSize };
 }
+
+} // namespace fwc

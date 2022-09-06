@@ -4,6 +4,8 @@
 
 #include "wildcard.h"
 
+namespace fwc {
+
 class REMatch final: public WildcardMatch
 {
 public:
@@ -16,3 +18,5 @@ private:
 
     static void mkRegExPattern(const std::string& pattern);
 };
+
+} // namespace fwc

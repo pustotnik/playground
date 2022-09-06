@@ -11,6 +11,8 @@
 #include "utils.h"
 #include "mmapreader.h"
 
+namespace fwc {
+
 MMapReader::~MMapReader() {
     close();
 }
@@ -100,3 +102,5 @@ FileLineRef MMapReader::readLine() {
 
     return result;
 }
+
+} // namespace fwc

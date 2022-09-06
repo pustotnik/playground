@@ -1,14 +1,15 @@
 
 #include <cassert>
 
-#include "mtcondvarproc.h"
 #include "utils.h"
+#include "proctools.h"
+#include "mtcondvarproc.h"
 
-using namespace std;
+namespace fwc {
 
 MTCondVarProcessor::MTCondVarProcessor(size_t queueSize, size_t numOfConsThreads,
                                         size_t maxLines, bool needsBuffer):
-    BaseMTProcessor(numOfConsThreads, maxLines, needsBuffer),
+    BaseProdConsProcessor(numOfConsThreads),
     _blocksQueue(queueSize) {
 
     assert(queueSize > 0);
@@ -58,13 +59,13 @@ void MTCondVarProcessor::readFileLines(FileReader& freader) {
 
     for(;;) {
 
-        readInLinesBlock(freader, block);
+        proctools::readInLinesBlock(freader, block);
         if(block.lines().empty()) {
             // end of file
             break;
         }
 
-        unique_lock<mutex> lock(_queueMutex);
+        std::unique_lock<std::mutex> lock(_queueMutex);
         if(_blocksQueue.full()) {
             _cvNonFull.wait(lock, [&](){ return !_blocksQueue.full(); });
         }
@@ -73,13 +74,13 @@ void MTCondVarProcessor::readFileLines(FileReader& freader) {
         _cvNonEmpty.notify_one();
     }
 
-    scoped_lock lock(_queueMutex);
+    std::scoped_lock lock(_queueMutex);
     _stop = true;
     _cvNonEmpty.notify_all();
 }
 
 void MTCondVarProcessor::filterLines(size_t idx,
-                            WildcardMatch& wcmatch, const string& pattern) {
+                            WildcardMatch& wcmatch, const std::string& pattern) {
 
     assert(idx < _counters.size());
     size_t counter = 0;
@@ -87,7 +88,7 @@ void MTCondVarProcessor::filterLines(size_t idx,
 
     for(;;) {
 
-        unique_lock<mutex> lock(_queueMutex);
+        std::unique_lock<std::mutex> lock(_queueMutex);
         if(_blocksQueue.empty()) {
             _cvNonEmpty.wait(lock, [&](){ return !_blocksQueue.empty() || _stop; });
             if(_stop) {
@@ -105,8 +106,10 @@ void MTCondVarProcessor::filterLines(size_t idx,
         }
         lock.unlock();
 
-        counter += filterBlock(wcmatch, pattern, block);
+        counter += proctools::filterBlock(wcmatch, pattern, block);
     }
 
     _counters[idx] = counter;
 }
+
+} // namespace fwc

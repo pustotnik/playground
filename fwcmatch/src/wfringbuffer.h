@@ -7,6 +7,8 @@
 
 #include "noncopyable.h"
 
+namespace fwc {
+
 // Simple wait-free ring/circular buffer.
 // Thread safety is guaranteed in this way when push() and pop()
 // are used by a at most one corresponding thread.
@@ -110,3 +112,5 @@ private:
         return (idx + 1) % _capacity;
     }
 };
+
+} // namespace fwc

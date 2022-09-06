@@ -6,13 +6,15 @@
 
 #include "rigtorp/MPMCQueue.h"
 
-#include "basemtproc.h"
+#include "basepcproc.h"
+
+namespace fwc {
 
 /*
 This class uses MPMCQueue from https://github.com/rigtorp/MPMCQueue.
 */
 
-class MPMCProcessor final: public BaseMTProcessor
+class MPMCProcessor final: public BaseProdConsProcessor
 {
 public:
     MPMCProcessor(size_t queueSize, size_t numOfConsThreads,
@@ -32,3 +34,5 @@ private:
     BlockPtrsQueue             _blocksQueue;
     BlockPtrsQueue             _freeBlocks;
 };
+
+} // namespace fwc

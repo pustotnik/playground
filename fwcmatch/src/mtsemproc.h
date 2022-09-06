@@ -7,7 +7,9 @@
 #include <mutex>
 #include <semaphore>
 
-#include "basemtproc.h"
+#include "basepcproc.h"
+
+namespace fwc {
 
 /*
 This class implements strategy of solving the problem with mutexes and
@@ -15,7 +17,7 @@ semaphores. There is no memory reallocation during processing and
 it uses ring buffer for the queue of data between producer and consumers.
 */
 
-class MTSemProcessor final: public BaseMTProcessor
+class MTSemProcessor final: public BaseProdConsProcessor
 {
 public:
     MTSemProcessor(size_t queueSize, size_t numOfConsThreads,
@@ -39,3 +41,5 @@ private:
     std::unique_ptr<Semaphore> _semEmpty;
     std::unique_ptr<Semaphore> _semFull;
 };
+
+} // namespace fwc

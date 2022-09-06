@@ -50,20 +50,22 @@ add_compile_options(
 find_package(benchmark REQUIRED)
 
 set(SRC_LIST
-    src/bench.cpp
-    src/basemtproc.cpp
-    src/fgetsreader.cpp
-    src/fnmatchwildcard.cpp
-    src/fstreamreader.cpp
-    src/mmapreader.cpp
+    src/seqproc.cpp
     src/mtcondvarproc.cpp
-    src/mtcondvarproc2.cpp
-    src/mtlockfreeproc.cpp
-    src/mtmpmcproc.cpp
-    src/mtsemproc.cpp
-    src/mywildcard.cpp
+    src/fgetsreader.cpp
     src/regexwildcard.cpp
-    src/seqproc.cpp)
+    src/basepcproc.cpp
+    src/mmapreader.cpp
+    src/mywildcard.cpp
+    src/bench.cpp
+    src/fnmatchwildcard.cpp
+    src/mtsemproc.cpp
+    src/fstreamreader.cpp
+    src/mtlockfreeproc.cpp
+    src/mtcondvarproc2.cpp
+    src/mtmpmcproc.cpp
+    src/proctools.cpp
+)
 
 add_executable(fwcmatch-bench ${SRC_LIST})
 target_link_libraries(fwcmatch-bench benchmark::benchmark)

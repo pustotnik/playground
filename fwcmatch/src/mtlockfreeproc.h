@@ -5,7 +5,9 @@
 #include <atomic>
 
 #include "wfringbuffer.h"
-#include "basemtproc.h"
+#include "basepcproc.h"
+
+namespace fwc {
 
 /*
 This class implements strategy of solving the problem as a group of
@@ -19,7 +21,7 @@ disadvantage of this method.
 
 There is no memory reallocation during processing.
 */
-class MTLockFreeProcessor final: public BaseMTProcessor
+class MTLockFreeProcessor final: public BaseProdConsProcessor
 {
 public:
     MTLockFreeProcessor(size_t queueSize, size_t numOfConsThreads,
@@ -64,3 +66,5 @@ inline size_t MTLockFreeProcessor::calcFinalResult() const {
     }
     return result;
 }
+
+} // namespace fwc

@@ -6,6 +6,8 @@
 
 #include "noncopyable.h"
 
+namespace fwc {
+
 // Simple ring/circular buffer
 // It is not general-purpose implementation.
 template <typename T>
@@ -77,3 +79,5 @@ private:
         }
     }
 };
+
+} // namespace fwc

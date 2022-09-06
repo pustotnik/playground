@@ -8,6 +8,8 @@
 
 #include "noncopyable.h"
 
+namespace fwc {
+
 // Some ring/circular buffer for single producer and many consumers
 // and based on some idea from LMAX Disruptor.
 // Not thread safe but can be used with mutex locks outside.
@@ -98,3 +100,5 @@ private:
         return minPos;
     }
 };
+
+} // namespace fwc

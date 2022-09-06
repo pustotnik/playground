@@ -8,6 +8,8 @@
 #include "utils.h"
 #include "fstreamreader.h"
 
+namespace fwc {
+
 FStreamReader::~FStreamReader() {
     close();
 }
@@ -71,3 +73,5 @@ FileLineRef FStreamReader::readLine() {
 
     return { _buffer, lineSize };
 }
+
+} // namespace fwc

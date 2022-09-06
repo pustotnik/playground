@@ -5,6 +5,8 @@
 
 #include "filereader.h"
 
+namespace fwc {
+
 class MMapReader final: public FileReader
 {
 public:
@@ -30,3 +32,5 @@ private:
     size_t      _fileSize { 0 };
     int         _file =   { -1};
 };
+
+} // namespace fwc

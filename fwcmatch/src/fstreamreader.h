@@ -4,6 +4,8 @@
 
 #include "filereader.h"
 
+namespace fwc {
+
 class FStreamReader final: public FileReader
 {
 public:
@@ -25,3 +27,5 @@ public:
 private:
     std::ifstream _stream;
 };
+
+} // namespace fwc

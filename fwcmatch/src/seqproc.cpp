@@ -4,50 +4,36 @@
 #include <algorithm>
 #include <iostream>
 
+#include "proctools.h"
 #include "seqproc.h"
 
-using namespace std;
+namespace fwc {
 
 static constexpr size_t BLOCK_SIZE = 4*1024;
 
-SequentialProcessor::SequentialProcessor(size_t maxLines, bool needsBuffer):
-    _maxLines(maxLines) {
+SequentialProcessor::SequentialProcessor(size_t maxLines, bool needsBuffer) {
 
-    assert(_maxLines > 0);
+    assert(maxLines > 0);
     _linesBlock.alloc(maxLines, needsBuffer, BLOCK_SIZE);
 }
 
-size_t SequentialProcessor::execute(FileReader& freader, const string& filename,
-                            WildcardMatch& wcmatch, const string& pattern) {
-
-    const bool needsBuffer = freader.needsBuffer();
-    auto& buffer = _linesBlock.buffer();
+size_t SequentialProcessor::execute(FileReader& freader, const std::string& filename,
+                            WildcardMatch& wcmatch, const std::string& pattern) {
 
     ScopedFileOpener fopener(freader, filename);
 
-    size_t i, result = 0;
+    size_t result = 0;
     for(;;) {
-        _linesBlock.clear();
-        for(i = 0; i < _maxLines; ++i) {
-            if(needsBuffer) {
-                freader.setBuffer(buffer.get(i), buffer.blockSize());
-            }
-            auto line = freader.readLine();
-            if(!line.data()) {
-                break;
-            }
-            _linesBlock.addLine(std::move(line));
-        }
-
-        auto const& flines = _linesBlock.lines();
-        if(flines.empty()) {
+        proctools::readInLinesBlock(freader, _linesBlock);
+        if(_linesBlock.lines().empty()) {
+            // end of file
             break;
         }
 
-        result += std::count_if(flines.begin(), flines.end(),
-            [&](auto& line){ return wcmatch.isMatch(line, pattern); }
-        );
+        result += proctools::filterBlock(wcmatch, pattern, _linesBlock);
     }
 
     return result;
 }
+
+} // namespace fwc

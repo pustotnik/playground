@@ -8,7 +8,9 @@
 
 #include "dringbuffer.h"
 #include "linesblock.h"
-#include "basemtproc.h"
+#include "basepcproc.h"
+
+namespace fwc {
 
 /*
 This class implements alternative version of MTCondVarProcessor.
@@ -16,7 +18,7 @@ In theory this implemenation has better memory locality but uses more mutex lock
 or copying of blocks if blocks without a buffer (mmap).
 */
 
-class MTCondVarProcessor2 final: public BaseMTProcessor
+class MTCondVarProcessor2 final: public BaseProdConsProcessor
 {
 public:
     MTCondVarProcessor2(size_t queueSize, size_t numOfConsThreads,
@@ -38,4 +40,7 @@ private:
     std::condition_variable _cvNonEmpty;
     std::condition_variable _cvNonFull;
     bool                    _stop        { false };
+    const bool              _needsBuffer;
 };
+
+} // namespace fwc
