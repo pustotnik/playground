@@ -47,6 +47,7 @@ add_compile_options(
 
 ###########################################################################
 
+find_package(OpenMP REQUIRED)
 find_package(benchmark REQUIRED)
 
 set(SRC_LIST
@@ -65,8 +66,9 @@ set(SRC_LIST
     src/mtcondvarproc2.cpp
     src/mtmpmcproc.cpp
     src/proctools.cpp
+    src/mtlockreadproc.cpp
 )
 
 add_executable(fwcmatch-bench ${SRC_LIST})
-target_link_libraries(fwcmatch-bench benchmark::benchmark)
+target_link_libraries(fwcmatch-bench benchmark::benchmark OpenMP::OpenMP_CXX)
 

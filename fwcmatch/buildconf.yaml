@@ -13,8 +13,8 @@ configure:
 # Results with -flto with g++ (11.2.1) aren't stable. Some tests get
 # better performance while some others don't get it and this draws a strange picture.
 # So I decided to turn off -flto for this project.
-CMN_CXXFLAGS: -Wall -Wextra -std=c++20 -fno-rtti #-flto
-CMN_LINK_FLAGS: "" #-flto
+CMN_CXXFLAGS: -Wall -Wextra -std=c++20 -fno-rtti -fopenmp #-flto
+CMN_LINK_FLAGS: -fopenmp #-flto
 
 SANIT_CMN_CXXFLAGS: $CMN_CXXFLAGS -fsanitize=address
 SANIT_CMN_LINK_FLAGS: $CMN_LINK_FLAGS -fsanitize=address
@@ -28,7 +28,7 @@ buildtypes:
     #cxxflags: $CMN_CXXFLAGS -O2
     cxxflags: $CMN_CXXFLAGS -O3
     linkflags: $CMN_LINK_FLAGS
-    defines: NDEBUG=1 # turn off asserts
+    defines: NDEBUG # turn off asserts
 
   debug:
     cxxflags: $CMN_CXXFLAGS -O0 -g

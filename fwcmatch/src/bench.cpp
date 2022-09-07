@@ -18,6 +18,7 @@
 #include "mtlockfreeproc.h"
 #include "mtsemproc.h"
 #include "mtmpmcproc.h"
+#include "mtlockreadproc.h"
 
 using namespace std;
 using namespace fwc;
@@ -212,6 +213,58 @@ BENCHMARK(BM_MTMPMC<FStreamReader, MyWildcardMatch>)
 
 BENCHMARK(BM_MTMPMC<MMapReader, MyWildcardMatch>)
     ->Apply(genMultithreadingArguments);
+
+template<typename FReader, typename WildcardMatch>
+void BM_MTLockRead(benchmark::State& state) {
+
+    const size_t numOfThreads  = state.range(0);
+    const size_t maxLines      = state.range(1);
+
+    auto freader   = FReader();
+    auto wcmatch   = WildcardMatch();
+    auto processor = MTLockReadProcessor(numOfThreads, maxLines, freader.needsBuffer());
+
+    size_t found = 0;
+    for (auto _ : state) {
+        found = processor.execute(freader, benchFileName, wcmatch, benchPattern);
+        benchmark::DoNotOptimize(found);
+    }
+
+    state.counters["Count"] = found;
+}
+
+static void genMultithreading2Arguments(benchmark::internal::Benchmark* b) {
+    b
+    // numOfThreads, maxLines
+
+    ->Args({2, 96})
+    ->Args({2, 256})
+    ->Args({2, 512})
+
+    ->Args({4, 96})
+    ->Args({4, 256})
+    ->Args({4, 512})
+
+    ->Args({8, 96})
+    ->Args({8, 256})
+    ->Args({8, 512})
+
+    ->ArgNames({"threads", "mlines" })
+    ->Unit(benchmark::kMillisecond)
+    ->MeasureProcessCPUTime()
+    ->UseRealTime();
+}
+
+/*
+BENCHMARK(BM_MTLockRead<FGetsReader, MyWildcardMatch>)
+    ->Apply(genMultithreading2Arguments);
+*/
+
+BENCHMARK(BM_MTLockRead<FStreamReader, MyWildcardMatch>)
+    ->Apply(genMultithreading2Arguments);
+
+BENCHMARK(BM_MTLockRead<MMapReader, MyWildcardMatch>)
+    ->Apply(genMultithreading2Arguments);
 
 // Run the benchmarks
 int main(int argc, char** argv) {
