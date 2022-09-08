@@ -432,20 +432,22 @@ All next observations are actual only for **these** benchmarks on **this** syste
 On different OS/hardware/implementation the results can be different.
 
 - C++ iostream can work a little bit faster then C fgets.
-- FNMatch works a little bit slower than MyWildcardMatch just because fnmatch
+- FNMatch works slower than MyWildcardMatch just because fnmatch
   requires C string terminated with '\0' and I had to make copy of each file
-  line because it is requirement of my interface (string_view is used).
+  line because original text lines from afile don't have this symbol while
+  MyWildcardMatch can be used just with pointers to begin/end of string without
+  copying of text to create new string with '\0'.
 - There is no reason to use number of read/filtered lines more than
   one at one time for single-threaded implementation.
   But it is important for multi-threaded implementation.
 - Increasing number of threads in multi-threaded implementation is not always
-  optimal decision. But it is because file I/O is bottleneck for this task
-  and it can increase thread contention.
+  optimal decision. The main problems are thread contention and the fact
+  that file I/O is bottleneck for this task.
 - Lock-free/busy-waiting solution is not always the best choice.
 - MTSem (semaphores) is similar to the MTCondVar (condition variables)
   in terms of performance but the MTCondVar is a little bit better.
-- Memory/data locality is important for general performance.
-- For perfomance reason it is better to hold size of memory for
+- Memory/data locality can be important for general performance.
+- For performance reason it is better to hold size of memory for
   queue (ring buffer) and all blocks with data less than CPU L3 cache size.
 
 ## About mmap
@@ -475,14 +477,15 @@ for a random access (especially on SSD).
 Also I can recommend to read [this](https://sasha-f.medium.com/why-mmap-is-faster-than-system-calls-24718e75ab37).
 
 ## About busy-waiting solutions with atomic
-In this solution I used implementation of
-ring buffer from [here](https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular) in the first variant.
+For MTLockFree I used implementation of
+ring buffer from [here](https://www.codeproject.com/Articles/43510/Lock-Free-Single-Producer-Single-Consumer-Circular)
+with some extentions.
 This container is thread-safe but only for single producer and single consumer variant.
 So I implemented this as a group of pairs "single producer -> single consumer" where
 my single producer emulates many producers in a loop. In some cases this solution showed better
-performance than solution with conditional variables but not always.
+performance than solution with conditional variables (MTCondVar) but not always.
 The second variant uses MPMCQueue from [here](https://github.com/rigtorp/MPMCQueue) and has very similar
-performance with the first variant.
+performance with the MTLockFree.
 The main problem with both variants is busy-waiting on CPU when these queues are full or empty.
 Look at the column "CPU" to see the proof. And if you set number of threads
 more than necessery for optimal processing then a lot of time this code will
@@ -511,19 +514,20 @@ BM_MTLockFree<FStreamReader, MyWildcardMatch>/qsize:16/threads:16/mlines:256/pro
 ```
 
 ## About MTLockRead
-It is simplest way to implement a solution for the problem. In each thread we read and filter
-but for reading we use mutex lock because we cannot read single file in different
-threads concurrently. There is no any queue. I implemented this in two ways: with std::thread/std::mutex and with OpenMP.
+It is simplest way to implement a solution for the problem. We read and filter
+in each thread but for reading we use mutex lock because we cannot read a single file in different
+threads concurrently. But there is no any queue in this case.
+I implemented this in two ways: with std::thread/std::mutex and with OpenMP.
 The OpenMP variant is shorter in code and runs a little bit faster (I don't know why).
-It is interesting that this solution shows really good performance.
+It is interesting that this solution shows a really good performance.
 
 ## About spinlocks
 I used spinlocks a lot in the past (as the spin_mutex from Intel TBB)
 and you can find a lot of variants on the internet how to implement such a thing
 (from std::atomic_flag for example) but I'm not sure that they all work properly.
-Also I can recommend to read this: https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723
+Also I can recommend to read [this](https://www.realworldtech.com/forum/?threadid=189711&curpostid=189723).
 Nevertheless as I know modern implementations of std::mutex already use similar
-thing inside for a short waitings and I think this can be enough already.
+thing inside for short waitings and I think this can be enough in many cases.
 But it depends on implementation and hardware.
 
 ## Memory locality
@@ -531,5 +535,15 @@ This can improve performance but you must be accurate in
 a way how to achieve it. I improved memory locality for any reading/filtering
 in the case of using a buffer (FGetsReader, FStreamReader). Also I tried to do it
 for a ring buffer and made MTCondVar2 but I had to use more mutex locks or
-copying of current block and benchmarks showed that for current task the MTCondVar
+copying of current block and my benchmarks showed that the MTCondVar
 is better in terms of performance.
+
+## What I didn't try
+Of course there are several other ways to implement solution for this problem
+and I mean use of some tasking system in explicit or implicit way. At least I know
+about Intel TBB/OneTBB (flow graph or direct use of tasks), OpenMP (task directive) and
+Apple’s [libdispatch](https://github.com/apple/swift-corelibs-libdispatch)
+a.k.a. Grand Central Dispatch. In theory the use of such a system can produce the
+fastest and more scalable solution and maybe later I will try one of them.
+Any way the effective implementation of such a system is not trivial task and it
+is better to use something ready to use.
