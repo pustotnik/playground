@@ -20,11 +20,10 @@
 #include "mtmpmcproc.h"
 #include "mtlockreadproc.h"
 
-using namespace std;
 using namespace fwc;
 
-static string benchFileName;
-static string benchPattern;
+static std::string benchFileName;
+static std::string benchPattern;
 
 template<typename FReader, typename WildcardMatch>
 void BM_Sequential(benchmark::State& state) {
@@ -266,35 +265,50 @@ BENCHMARK(BM_MTLockRead<FStreamReader, MyWildcardMatch>)
 BENCHMARK(BM_MTLockRead<MMapReader, MyWildcardMatch>)
     ->Apply(genMultithreading2Arguments);
 
+static bool handleEnvVars() {
+
+    const char* envvar = nullptr;
+
+    auto printErr = [](const std::string& msg) {
+        std::cerr << msg << std::endl;
+    };
+
+    envvar = std::getenv("BENCH_FILENAME");
+    if(!envvar) {
+        printErr("Environment variable BENCH_FILENAME is not set!");
+        return false;
+    }
+    benchFileName = envvar;
+    if(benchFileName.empty()) {
+        printErr("Environment variable BENCH_FILENAME is empty!");
+        return false;
+    }
+
+    envvar = std::getenv("BENCH_PATTERN");
+    if(!envvar) {
+        printErr("Environment variable BENCH_PATTERN is not set!");
+        return false;
+    }
+    benchPattern = envvar;
+
+    return true;
+}
+
 // Run the benchmarks
 int main(int argc, char** argv) {
 
     // Unfortunately google benchmark library does not support custom
     // arguments in a command line so I decided to use env vars.
 
-    const char* envvar = std::getenv("BENCH_FILENAME");
-    benchFileName = envvar ? envvar : "";
-    envvar = std::getenv("BENCH_PATTERN");
-    benchPattern = envvar ? envvar : "";
-
-    bool noEnvVars = false;
-    if(benchFileName.empty()) {
-        cout << "Environment variable BENCH_FILENAME is not set or empty!" << endl;
-        noEnvVars = true;
-    }
-
-    if(benchPattern.empty()) {
-        cout << "Environment variable BENCH_PATTERN is not set or empty!" << endl;
-        noEnvVars = true;
-    }
-
-    if(noEnvVars) {
+    if(!handleEnvVars()) {
         return 1;
     }
 
     ::benchmark::Initialize(&argc, argv);
-    if (::benchmark::ReportUnrecognizedArguments(argc, argv))
+    if (::benchmark::ReportUnrecognizedArguments(argc, argv)) {
         return 1;
+    }
+
     ::benchmark::RunSpecifiedBenchmarks();
     ::benchmark::Shutdown();
     return 0;
