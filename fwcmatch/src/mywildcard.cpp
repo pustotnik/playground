@@ -1,13 +1,10 @@
 
 #include "mywildcard.h"
+#include <cassert>
 
 namespace fwc {
 
-bool MyWildcardMatch::isMatch(const std::string_view& text, const std::string& pattern) const {
-
-    if(text.empty() || pattern.empty()) {
-        return false;
-    }
+bool MyWildcardMatch::isMatchImpl(const std::string_view& text, const std::string& pattern) const {
 
     const char* ppattern = pattern.c_str();
     const char* ptext    = text.cbegin();

@@ -43,11 +43,7 @@ static void replaceAll(string& str, const string& from, const string& to) {
     }
 }
 
-bool REMatch::isMatch(const string_view& text, const string& pattern) const {
-
-    if(text.empty() || pattern.empty()) {
-        return false;
-    }
+bool REMatch::isMatchImpl(const string_view& text, const string& pattern) const {
 
     mkRegExPattern(pattern);
     return regex_match(text.cbegin(), text.cend(), _regex);

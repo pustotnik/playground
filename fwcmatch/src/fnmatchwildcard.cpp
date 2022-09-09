@@ -7,11 +7,7 @@ namespace fwc {
 
 thread_local std::string FNMatch::_text;
 
-bool FNMatch::isMatch(const std::string_view& text, const std::string& pattern) const {
-
-    if(text.empty() || pattern.empty()) {
-        return false;
-    }
+bool FNMatch::isMatchImpl(const std::string_view& text, const std::string& pattern) const {
 
     // fnmatch expects C string terminated by a null character '\0' while we
     // have no such a string in the 'text' so I have to make a copy from the
