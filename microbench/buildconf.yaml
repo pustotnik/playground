@@ -5,6 +5,9 @@ tasks:
   return_several :
     features : cxxprogram
     source   : return_several.cpp
+  containers :
+    features : cxxprogram
+    source   : containers.cpp
 
 byfilter:
   - for: all

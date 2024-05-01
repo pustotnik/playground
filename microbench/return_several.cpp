@@ -2,7 +2,6 @@
 #include <cstddef>
 #include <tuple>
 #include <utility>
-#include <iostream>
 
 #include <benchmark/benchmark.h>
 
