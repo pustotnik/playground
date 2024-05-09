@@ -1,11 +1,4 @@
 
-## Why
-
-I wanted to make some benchmarks to see a real performance of searching for some small
-string key in popular C++ containers vector, map and unordered_map of small size.
-
-## Results
-
 - Hardware: HP Elitebook 850 g5
 - OS: Gentoo Linux (kernel 6.1.81)
 - C++ compiler: g++ 13.2.1 (-std=c++17 -fno-exceptions -fno-rtti -O3)
