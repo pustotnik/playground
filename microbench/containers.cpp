@@ -1,5 +1,6 @@
 
 #include <cstddef>
+#include <cstdlib>
 #include <utility>
 #include <vector>
 #include <map>
@@ -10,25 +11,49 @@
 
 using namespace std;
 
-static constexpr size_t SMALL_CONTAINER_SIZE = 20;
+namespace {
+
+constexpr size_t SMALL_CONTAINER_SIZE = 20;
+constexpr const char CHARSET[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
 using StrItem = pair<std::string, size_t>;
 
-static std::vector<StrItem> genSmallInput() {
+std::string gen_random_str() {
+    std::string str(CHARSET, 18);
+    for(size_t i = 0; i < str.size(); ++i) {
+        swap(str[i], str[rand() % str.size()]);
+    }
+    return str;
+}
+
+std::vector<StrItem> genInput(size_t size) {
     std::vector<StrItem> result;
-    for(size_t i = 0; i < SMALL_CONTAINER_SIZE; ++i) {
-        char ch = 'a' + i;
-        std::string key(15, ch);
-        result.push_back(StrItem(key, i + 101));
+    // we want random strings but we want the same random strings for every benchmark
+    srand(11);
+    for(size_t i = 0; i < size; ++i) {
+        result.push_back(StrItem(gen_random_str(), i + 101));
     }
 
     return result;
 }
 
-static const std::vector<StrItem> smallInput = genSmallInput();
+const std::vector<StrItem> smallInput = genInput(SMALL_CONTAINER_SIZE);
+
+} // namespace
+
+static void genArguments(benchmark::internal::Benchmark* b) {
+    b
+    ->Args({0,})
+    ->Args({static_cast<long>(smallInput.size()/2), })
+    ->Args({static_cast<long>(smallInput.size()-1), })
+    ->ArgNames({"search position", });
+}
 
 static void BM_SearchInVector(benchmark::State& state) {
+    const size_t pos = state.range(0);
+
     std::vector<StrItem> container = smallInput;
-    auto findStr = smallInput[smallInput.size() - 1].first;
+    auto findStr = smallInput[pos].first;
 
     int found = 0;
     for (auto _ : state) {
@@ -42,15 +67,17 @@ static void BM_SearchInVector(benchmark::State& state) {
     }
     state.counters["Result"] = found;
 }
-BENCHMARK(BM_SearchInVector);
+BENCHMARK(BM_SearchInVector)->Apply(genArguments);
 
 static void BM_SearchInMap(benchmark::State& state) {
+    const size_t pos = state.range(0);
+
     std::map<std::string, size_t> container;
     for(auto [key, val]: smallInput) {
         container[key] = val;
     }
 
-    auto findStr = smallInput[smallInput.size() - 1].first;
+    auto findStr = smallInput[pos].first;
     int found = 0;
     for (auto _ : state) {
         found = container.find(findStr)->second;
@@ -58,15 +85,17 @@ static void BM_SearchInMap(benchmark::State& state) {
     }
     state.counters["Result"] = found;
 }
-BENCHMARK(BM_SearchInMap);
+BENCHMARK(BM_SearchInMap)->Apply(genArguments);
 
 static void BM_SearchInUnorderedMap(benchmark::State& state) {
+    const size_t pos = state.range(0);
+
     std::unordered_map<std::string, size_t> container;
     for(auto [key, val]: smallInput) {
         container[key] = val;
     }
-    auto findStr = smallInput[smallInput.size() - 1].first;
 
+    auto findStr = smallInput[pos].first;
     int found = 0;
     for (auto _ : state) {
         found = container.find(findStr)->second;
@@ -74,7 +103,7 @@ static void BM_SearchInUnorderedMap(benchmark::State& state) {
     }
     state.counters["Result"] = found;
 }
-BENCHMARK(BM_SearchInUnorderedMap);
+BENCHMARK(BM_SearchInUnorderedMap)->Apply(genArguments);
 
 
 // Run the benchmarks
