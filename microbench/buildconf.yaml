@@ -14,10 +14,21 @@ byfilter:
     set:
       libs: benchmark
       toolchain : auto-c++
-      cxxflags.select:
-        #default: $CMN_GCC_FLAGS -O2
-        default: $CMN_GCC_FLAGS -O3
-        msvc   : /O2 /EHsc
+
+buildtypes:
+  default : release
+
+  release:
+    cxxflags.select:
+      #default: $CMN_GCC_FLAGS -O2
+      default: $CMN_GCC_FLAGS -O3
+      msvc   : /O2 /EHsc
+    defines: NDEBUG # turn off asserts
+
+  debug:
+    cxxflags.select:
+      default: $CMN_GCC_FLAGS -O0 -g
+      msvc   : /Od /EHsc
 
 configure:
   - do: check-libs
