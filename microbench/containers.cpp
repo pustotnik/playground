@@ -78,6 +78,9 @@ public:
     bool notEqualByHash(const SomeArgs& other) const noexcept {
         return hash(false) != other.hash(false);
     }
+    bool notEqualByHashPartlyCached(const SomeArgs& other) const noexcept {
+        return hash(true) != other.hash(false);
+    }
     bool notEqualByHashCached(const SomeArgs& other) const noexcept {
         return hash(true) != other.hash(true);
     }
@@ -246,12 +249,19 @@ static void BM_NotEqualHash(benchmark::State& state) {
 }
 BENCHMARK(BM_NotEqualHash)->Apply(genArgumentsForNotEqual);
 
-static void BM_NotEqualHashCached(benchmark::State& state) {
+static void BM_NotEqualHashPartlyCached(benchmark::State& state) {
+    BM_NotEqualImpl(state, [](const SomeArgs& lhs, const SomeArgs& rhs) {
+        return lhs.notEqualByHashPartlyCached(rhs);
+    });
+}
+BENCHMARK(BM_NotEqualHashPartlyCached)->Apply(genArgumentsForNotEqual);
+
+static void BM_NotEqualHashFullyCached(benchmark::State& state) {
     BM_NotEqualImpl(state, [](const SomeArgs& lhs, const SomeArgs& rhs) {
         return lhs.notEqualByHashCached(rhs);
     });
 }
-BENCHMARK(BM_NotEqualHashCached)->Apply(genArgumentsForNotEqual);
+BENCHMARK(BM_NotEqualHashFullyCached)->Apply(genArgumentsForNotEqual);
 
 // Run the benchmarks
 BENCHMARK_MAIN();
