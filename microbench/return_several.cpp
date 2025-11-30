@@ -9,6 +9,11 @@ using namespace std;
 
 static constexpr size_t VECT_SIZE = 100;
 
+/*
+Take in account that tests BM_ReturnAs.. and BM_ReturnVectorAsArg, BM_ReturnVector, BM_CopyVector
+are different. They test different cases.
+*/
+
 class Test
 {
 public:

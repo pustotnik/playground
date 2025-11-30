@@ -6,7 +6,8 @@
 ### containers:
 I wanted to make some micro benchmarks to see a real performance.
 
-Searching for some small string key in popular C++ containers vector, map and unordered_map of small size
+#### Searching for some small string key in popular C++ containers vector, map and unordered_map of small size
+
 ```
 --------------------------------------------------------------------------------------------------------------
 Benchmark                                                    Time             CPU   Iterations UserCounters...
@@ -31,10 +32,11 @@ BM_SearchInUnorderedMap/search position:19                4.01 ns         4.01 n
 I often see assertions that std::vector is often the fastest container for small sizes and I agree with
 this for some cases but it is better to check your cases how it is fast in reality. Also people not
 always remember that hash table (unordered_map) has complexity O(1) only in average case which does
-not mean that it has such complexity in all cases. Real results for this particular case shows that
+not mean that it has such complexity in all cases. Provided results for this particular case shows that
 map (balanced tree) is the best in average case.
 
-Comparison for "not equality" of simple struct with std::string
+#### Comparison for "not equality" of simple struct with std::string
+
 ```
 --------------------------------------------------------------------------------------------------------------------
 Benchmark                                                          Time             CPU   Iterations UserCounters...
